@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trabajo - Mi Organizador Personal</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <h1 class="nav-title" style="margin-bottom: 10px; " >Mi Organizador Personal</h1>
+            <ul class="nav-links">
+                <li><a href="../index.html" class="nav-link">Inicio</a></li>
+                <li><a href="plan-alimentacion.html" class="nav-link">🍎 Alimentación</a></li>
+                <li><a href="plan-gym.html" class="nav-link">💪 Gym</a></li>
+                <li><a href="magister.html" class="nav-link">🎓 Magíster</a></li>
+                <li><a href="trabajo.html" class="nav-link active">💼 Trabajo</a></li>
+                <li><a href="hogar.html" class="nav-link">🏠 Hogar</a></li>
+                <li><a href="app-ejercicios.html" class="nav-link">🏃 Ejercicios</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="page-content">
+        <div class="container">
+            <header class="page-header">
+                <h1 class="page-title">💼 Trabajo</h1>
+                <p class="page-subtitle">Gestiona tus proyectos de optimizador y desarrollo backend</p>
+            </header>
+
+            <!-- Optimizador de Mezclas -->
+            <section class="section">
+                <div class="section-header">
+                    <h2><span class="section-icon">⚗️</span> Optimizador de Mezclas</h2>
+                    <div class="filters">
+                        <div class="filter-group">
+                            <label for="filter-optimizer-status">Estado:</label>
+                            <select id="filter-optimizer-status" onchange="filterOptimizerTasks()">
+                                <option value="all">Todas las tareas</option>
+                                <option value="pendiente">Pendientes</option>
+                                <option value="en progreso">En progreso</option>
+                                <option value="completado">Completadas</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-small" onclick="refreshOptimizerData()">🔄 Actualizar</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <div id="tabla-optimizador">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <span>Cargando tareas del optimizador...</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar" id="optimizer-progress" style="width: 0%">0% Completado</div>
+                </div>
+            </section>
+
+            <!-- Mapa y Backend -->
+            <section class="section">
+                <div class="section-header">
+                    <h2><span class="section-icon">🗺️</span> Mapa y Backend</h2>
+                    <div class="filters">
+                        <div class="filter-group">
+                            <label for="filter-backend-status">Estado:</label>
+                            <select id="filter-backend-status" onchange="filterBackendTasks()">
+                                <option value="all">Todas las tareas</option>
+                                <option value="pendiente">Pendientes</option>
+                                <option value="en progreso">En progreso</option>
+                                <option value="completado">Completadas</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-small" onclick="refreshBackendData()">🔄 Actualizar</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <div id="tabla-backend">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <span>Cargando tareas del backend...</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar" id="backend-progress" style="width: 0%">0% Completado</div>
+                </div>
+            </section>
+
+            <!-- Estadísticas de Proyectos -->
+            <section class="section">
+                <div class="section-header">
+                    <h2><span class="section-icon">📊</span> Estadísticas de Proyectos</h2>
+                </div>
+                <div class="cards-grid">
+                    <div class="summary-card">
+                        <div class="card-icon">⚗️</div>
+                        <div class="card-content">
+                            <h3 class="card-title">Optimizador</h3>
+                            <p class="card-description">Progreso general</p>
+                            <div class="card-stats">
+                                <span class="stat" id="optimizer-stats">0% completado</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon">🗺️</div>
+                        <div class="card-content">
+                            <h3 class="card-title">Mapa y Backend</h3>
+                            <p class="card-description">Progreso general</p>
+                            <div class="card-stats">
+                                <span class="stat" id="backend-stats">0% completado</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon">📈</div>
+                        <div class="card-content">
+                            <h3 class="card-title">Progreso Total</h3>
+                            <p class="card-description">Ambos proyectos</p>
+                            <div class="card-stats">
+                                <span class="stat" id="total-progress">0% completado</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon">⏰</div>
+                        <div class="card-content">
+                            <h3 class="card-title">Tareas Urgentes</h3>
+                            <p class="card-description">Requieren atención</p>
+                            <div class="card-stats">
+                                <span class="stat" id="urgent-tasks">0 tareas</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Actions -->
+            <section class="quick-actions">
+                <h2 class="section-title">Acciones Rápidas</h2>
+                <div class="actions-grid">
+                    <button class="action-btn" onclick="addNewTask()">
+                        ➕ Agregar Tarea
+                    </button>
+                    <button class="action-btn" onclick="updateTaskStatus()">
+                        📝 Actualizar Estado
+                    </button>
+                    <button class="action-btn" onclick="exportProjectReport()">
+                        📤 Exportar Reporte
+                    </button>
+                    <button class="action-btn" onclick="viewProjectTimeline()">
+                        📅 Ver Timeline
+                    </button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Mi Organizador Personal. Productividad en tus proyectos de trabajo.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="../js/sheets.js"></script>
+    <script src="../js/ui.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadWorkData();
+        });
+
+        async function loadWorkData() {
+            try {
+                const workData = await getSheetData(GOOGLE_SHEETS_CONFIG.SHEET_ID, 'Trabajo!A1:D50');
+                
+                // Filter data by project type
+                const optimizerTasks = workData.filter(row => row[0] === 'Optimizador de mezclas');
+                const backendTasks = workData.filter(row => row[0] === 'Mapa y Backend');
+                
+                // Render tables
+                renderTable([['Proyecto', 'Subtarea', 'Prioridad', 'Estado'], ...optimizerTasks], 'tabla-optimizador', {
+                    headers: ['Proyecto', 'Subtarea', 'Prioridad', 'Estado'],
+                    className: 'work-table',
+                    actionColumn: 3,
+                    actionCallback: toggleTaskStatus
+                });
+
+                renderTable([['Proyecto', 'Subtarea', 'Prioridad', 'Estado'], ...backendTasks], 'tabla-backend', {
+                    headers: ['Proyecto', 'Subtarea', 'Prioridad', 'Estado'],
+                    className: 'work-table',
+                    actionColumn: 3,
+                    actionCallback: toggleTaskStatus
+                });
+
+                updateWorkStats(optimizerTasks, backendTasks);
+            } catch (error) {
+                console.error('Error loading work data:', error);
+                showLoadingError('tabla-optimizador');
+                showLoadingError('tabla-backend');
+            }
+        }
+
+        function updateWorkStats(optimizerTasks, backendTasks) {
+            // Calculate optimizer progress
+            const optimizerProgress = calculateProgress(optimizerTasks);
+            updateProgressBar('optimizer-progress', optimizerProgress);
+            document.getElementById('optimizer-stats').textContent = `${optimizerProgress}% completado`;
+            
+            // Calculate backend progress
+            const backendProgress = calculateProgress(backendTasks);
+            updateProgressBar('backend-progress', backendProgress);
+            document.getElementById('backend-stats').textContent = `${backendProgress}% completado`;
+            
+            // Calculate total progress
+            const allTasks = [...optimizerTasks, ...backendTasks];
+            const totalProgress = calculateProgress(allTasks);
+            document.getElementById('total-progress').textContent = `${totalProgress}% completado`;
+            
+            // Count urgent tasks (high priority and pending)
+            const urgentTasks = allTasks.filter(task => 
+                task[2] === 'Alta' && task[3] === 'pendiente'
+            ).length;
+            document.getElementById('urgent-tasks').textContent = `${urgentTasks} tareas`;
+        }
+
+        function calculateProgress(tasks) {
+            if (!tasks || tasks.length === 0) return 0;
+            
+            const completed = tasks.filter(task => task[3] === 'completado').length;
+            return Math.round((completed / tasks.length) * 100);
+        }
+
+        function updateProgressBar(elementId, percentage) {
+            const progressBar = document.getElementById(elementId);
+            progressBar.style.width = percentage + '%';
+            progressBar.textContent = percentage + '% Completado';
+        }
+
+        function toggleTaskStatus(rowIndex, data) {
+            const currentStatus = data[3];
+            let newStatus;
+            
+            if (currentStatus === 'pendiente') {
+                newStatus = 'en progreso';
+            } else if (currentStatus === 'en progreso') {
+                newStatus = 'completado';
+            } else {
+                newStatus = 'pendiente';
+            }
+            
+            console.log(`Updating task ${rowIndex} status to: ${newStatus}`);
+            loadWorkData();
+        }
+
+        async function refreshOptimizerData() {
+            document.getElementById('tabla-optimizador').innerHTML = '<div class="loading"><div class="spinner"></div><span>Actualizando...</span></div>';
+            await loadWorkData();
+        }
+
+        async function refreshBackendData() {
+            document.getElementById('tabla-backend').innerHTML = '<div class="loading"><div class="spinner"></div><span>Actualizando...</span></div>';
+            await loadWorkData();
+        }
+
+        function filterOptimizerTasks() {
+            const filter = document.getElementById('filter-optimizer-status').value;
+            filterTable('tabla-optimizador', 3, filter);
+        }
+
+        function filterBackendTasks() {
+            const filter = document.getElementById('filter-backend-status').value;
+            filterTable('tabla-backend', 3, filter);
+        }
+
+        function filterTable(tableId, columnIndex, filterValue) {
+            const table = document.querySelector(`#${tableId} table`);
+            if (!table) return;
+            
+            const rows = table.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                const cellValue = row.cells[columnIndex]?.textContent.toLowerCase();
+                const shouldShow = filterValue === 'all' || cellValue.includes(filterValue.toLowerCase());
+                row.style.display = shouldShow ? '' : 'none';
+            });
+        }
+
+        function addNewTask() {
+            const project = prompt('Proyecto (Optimizador de mezclas / Mapa y Backend):');
+            const task = prompt('Descripción de la tarea:');
+            const priority = prompt('Prioridad (Alta / Media / Baja):');
+            
+            if (project && task && priority) {
+                console.log('Adding new task:', { project, task, priority });
+                loadWorkData();
+            }
+        }
+
+        function updateTaskStatus() {
+            const taskDescription = prompt('Descripción de la tarea a actualizar:');
+            const newStatus = prompt('Nuevo estado (pendiente / en progreso / completado):');
+            
+            if (taskDescription && newStatus) {
+                console.log('Updating task status:', { taskDescription, newStatus });
+                loadWorkData();
+            }
+        }
+
+        function exportProjectReport() {
+            alert('Exportando reporte de proyectos...');
+        }
+
+        function viewProjectTimeline() {
+            alert('Función de timeline en desarrollo');
+        }
+
+        function showLoadingError(containerId) {
+            document.getElementById(containerId).innerHTML = 
+                '<div class="message error">Error al cargar los datos. Por favor, verifica la conexión con Google Sheets.</div>';
+        }
+    </script>
+</body>
+</html>

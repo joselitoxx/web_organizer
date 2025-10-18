@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan de Gym - Mi Organizador Personal</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <h1 class="nav-title" style="margin-bottom: 10px; " >Mi Organizador Personal</h1>
+            <ul class="nav-links">
+                <li><a href="../index.html" class="nav-link">Inicio</a></li>
+                <li><a href="plan-alimentacion.html" class="nav-link">🍎 Alimentación</a></li>
+                    <li><a href="plan-gym.html" class="nav-link gym active"><span class="emoji">💪</span>Gym</a></li>
+                <li><a href="magister.html" class="nav-link">🎓 Magíster</a></li>
+                <li><a href="trabajo.html" class="nav-link">💼 Trabajo</a></li>
+                <li><a href="hogar.html" class="nav-link">🏠 Hogar</a></li>
+                <li><a href="app-ejercicios.html" class="nav-link">🏃 Ejercicios</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="page-content">
+        <div class="container">
+            <header class="page-header">
+                <h1 class="page-title">💪 Plan de Gimnasio</h1>
+                <p class="page-subtitle">Gestiona tus rutinas de ejercicios caseros y de gimnasio</p>
+            </header>
+
+            <!-- Ejercicios Caseros -->
+            <section class="section">
+                <div class="section-header">
+                    <h2><span class="section-icon">🏠</span> Ejercicios Caseros</h2>
+                    <div class="filters">
+                        <div class="filter-group">
+                            <label for="filter-home-status">Estado:</label>
+                            <select id="filter-home-status" onchange="filterHomeExercises()">
+                                <option value="all">Todos</option>
+                                <option value="pending">Pendientes</option>
+                                <option value="completed">Completados</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-small" onclick="refreshHomeExercises()">🔄 Actualizar</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <div id="ejercicios-caseros">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <span>Cargando ejercicios caseros...</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar" id="home-progress" style="width: 0%">0% Completado</div>
+                </div>
+            </section>
+
+            <!-- Ejercicios de Gimnasio -->
+            <section class="section">
+                <div class="section-header">
+                    <h2><span class="section-icon">💪</span> Ejercicios de Gimnasio</h2>
+                    <div class="filters">
+                        <div class="filter-group">
+                            <label for="filter-gym-status">Estado:</label>
+                            <select id="filter-gym-status" onchange="filterGymExercises()">
+                                <option value="all">Todos</option>
+                                <option value="pending">Pendientes</option>
+                                <option value="completed">Completados</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="filter-muscle-group">Grupo:</label>
+                            <select id="filter-muscle-group" onchange="filterByMuscleGroup()">
+                                <option value="all">Todos los grupos</option>
+                                <option value="pecho">Pecho</option>
+                                <option value="espalda">Espalda</option>
+                                <option value="piernas">Piernas</option>
+                                <option value="brazos">Brazos</option>
+                                <option value="core">Core</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-small" onclick="refreshGymExercises()">🔄 Actualizar</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <div id="ejercicios-gimnasio">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <span>Cargando ejercicios de gimnasio...</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar" id="gym-progress" style="width: 0%">0% Completado</div>
+                </div>
+            </section>
+
+            <!-- Estadísticas de Entrenamiento -->
+            <section class="section">
+                <div class="section-header">
+                    <h2><span class="section-icon">📊</span> Estadísticas de Entrenamiento</h2>
+                </div>
+                <div class="cards-grid">
+                    <div class="summary-card">
+                        <div class="card-icon">🏠</div>
+                        <div class="card-content">
+                            <h3 class="card-title">Ejercicios Caseros</h3>
+                            <p class="card-description">Esta semana</p>
+                            <div class="card-stats">
+                                <span class="stat" id="home-stats">0 completados</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon">💪</div>
+                        <div class="card-content">
+                            <h3 class="card-title">Gimnasio</h3>
+                            <p class="card-description">Esta semana</p>
+                            <div class="card-stats">
+                                <span class="stat" id="gym-stats">0 completados</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon">🔥</div>
+                        <div class="card-content">
+                            <h3 class="card-title">Racha Actual</h3>
+                            <p class="card-description">Días consecutivos</p>
+                            <div class="card-stats">
+                                <span class="stat" id="streak-stats">0 días</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon">⏱️</div>
+                        <div class="card-content">
+                            <h3 class="card-title">Tiempo Total</h3>
+                            <p class="card-description">Esta semana</p>
+                            <div class="card-stats">
+                                <span class="stat" id="time-stats">0 min</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Actions -->
+            <section class="quick-actions">
+                <h2 class="section-title">Acciones Rápidas</h2>
+                <div class="actions-grid">
+                    <button class="action-btn" onclick="startWorkout()">
+                        ▶️ Iniciar Entrenamiento
+                    </button>
+                    <button class="action-btn" onclick="addCustomExercise()">
+                        ➕ Agregar Ejercicio
+                    </button>
+                    <button class="action-btn" onclick="exportWorkoutPlan()">
+                        📤 Exportar Plan
+                    </button>
+                    <button class="action-btn" onclick="viewWorkoutHistory()">
+                        📈 Ver Historial
+                    </button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Mi Organizador Personal. Mantente activo y saludable.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="../js/sheets.js"></script>
+    <script src="../js/ui.js"></script>
+    <script>
+        // Initialize page data
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadGymPlanData();
+        });
+
+        async function loadGymPlanData() {
+            try {
+                // Load home exercises
+                const homeExercisesData = await getSheetData(GOOGLE_SHEETS_CONFIG.SHEET_ID, 'Caseros!A1:E20');
+                renderTable(homeExercisesData, 'ejercicios-caseros', {
+                    headers: ['Ejercicio', 'Series', 'Repeticiones', 'Tiempo', 'Estado'],
+                    className: 'exercises-table',
+                    actionColumn: 4,
+                    actionCallback: toggleExerciseStatus
+                });
+
+                // Load gym exercises
+                const gymExercisesData = await getSheetData(GOOGLE_SHEETS_CONFIG.SHEET_ID, 'Gimnasio!A1:F25');
+                renderTable(gymExercisesData, 'ejercicios-gimnasio', {
+                    headers: ['Ejercicio', 'Grupo Muscular', 'Series', 'Repeticiones', 'Peso', 'Estado'],
+                    className: 'exercises-table',
+                    actionColumn: 5,
+                    actionCallback: toggleExerciseStatus
+                });
+
+                // Update progress bars and statistics
+                updateExerciseProgress(homeExercisesData, gymExercisesData);
+            } catch (error) {
+                console.error('Error loading gym plan data:', error);
+                showLoadingError('ejercicios-caseros');
+                showLoadingError('ejercicios-gimnasio');
+            }
+        }
+
+        function updateExerciseProgress(homeData, gymData) {
+            // Calculate home exercises progress
+            const homeProgress = calculateProgress(homeData);
+            updateProgressBar('home-progress', homeProgress);
+            
+            // Calculate gym exercises progress
+            const gymProgress = calculateProgress(gymData);
+            updateProgressBar('gym-progress', gymProgress);
+            
+            // Update statistics
+            updateExerciseStats(homeData, gymData);
+        }
+
+        function calculateProgress(data) {
+            if (!data || data.length <= 1) return 0;
+            
+            const exercises = data.slice(1); // Skip header
+            const completed = exercises.filter(ex => ex[ex.length - 1] === 'Completado').length;
+            return Math.round((completed / exercises.length) * 100);
+        }
+
+        function updateProgressBar(elementId, percentage) {
+            const progressBar = document.getElementById(elementId);
+            progressBar.style.width = percentage + '%';
+            progressBar.textContent = percentage + '% Completado';
+        }
+
+        function updateExerciseStats(homeData, gymData) {
+            // Count completed exercises
+            const homeCompleted = homeData ? homeData.slice(1).filter(ex => ex[ex.length - 1] === 'Completado').length : 0;
+            const gymCompleted = gymData ? gymData.slice(1).filter(ex => ex[ex.length - 1] === 'Completado').length : 0;
+            
+            document.getElementById('home-stats').textContent = `${homeCompleted} completados`;
+            document.getElementById('gym-stats').textContent = `${gymCompleted} completados`;
+            
+            // Mock data for streak and time
+            document.getElementById('streak-stats').textContent = '5 días';
+            document.getElementById('time-stats').textContent = '240 min';
+        }
+
+        function toggleExerciseStatus(rowIndex, data) {
+            // Toggle exercise status between 'Pendiente' and 'Completado'
+            const currentStatus = data[data.length - 1];
+            const newStatus = currentStatus === 'Completado' ? 'Pendiente' : 'Completado';
+            
+            // Update in Google Sheets
+            console.log(`Updating exercise ${rowIndex} status to: ${newStatus}`);
+            
+            // Refresh the data
+            loadGymPlanData();
+        }
+
+        async function refreshHomeExercises() {
+            document.getElementById('ejercicios-caseros').innerHTML = '<div class="loading"><div class="spinner"></div><span>Actualizando...</span></div>';
+            await loadGymPlanData();
+        }
+
+        async function refreshGymExercises() {
+            document.getElementById('ejercicios-gimnasio').innerHTML = '<div class="loading"><div class="spinner"></div><span>Actualizando...</span></div>';
+            await loadGymPlanData();
+        }
+
+        function filterHomeExercises() {
+            const filter = document.getElementById('filter-home-status').value;
+            filterTable('ejercicios-caseros', 4, filter); // Status column is index 4
+        }
+
+        function filterGymExercises() {
+            const filter = document.getElementById('filter-gym-status').value;
+            filterTable('ejercicios-gimnasio', 5, filter); // Status column is index 5
+        }
+
+        function filterByMuscleGroup() {
+            const filter = document.getElementById('filter-muscle-group').value;
+            filterTable('ejercicios-gimnasio', 1, filter); // Muscle group column is index 1
+        }
+
+        function filterTable(tableId, columnIndex, filterValue) {
+            const table = document.querySelector(`#${tableId} table`);
+            if (!table) return;
+            
+            const rows = table.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                const cellValue = row.cells[columnIndex]?.textContent.toLowerCase();
+                const shouldShow = filterValue === 'all' || cellValue.includes(filterValue.toLowerCase());
+                row.style.display = shouldShow ? '' : 'none';
+            });
+        }
+
+        function startWorkout() {
+            alert('Iniciando temporizador de entrenamiento...');
+        }
+
+        function addCustomExercise() {
+            const exercise = prompt('Nombre del ejercicio:');
+            const series = prompt('Número de series:');
+            const reps = prompt('Repeticiones:');
+            
+            if (exercise && series && reps) {
+                console.log('Adding custom exercise:', { exercise, series, reps });
+                loadGymPlanData();
+            }
+        }
+
+        function exportWorkoutPlan() {
+            alert('Exportando plan de entrenamiento...');
+        }
+
+        function viewWorkoutHistory() {
+            alert('Función de historial en desarrollo');
+        }
+
+        function showLoadingError(containerId) {
+            document.getElementById(containerId).innerHTML = 
+                '<div class="message error">Error al cargar los datos. Por favor, verifica la conexión con Google Sheets.</div>';
+        }
+    </script>
+</body>
+</html>

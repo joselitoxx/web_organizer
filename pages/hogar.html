@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hogar - Mi Organizador Personal</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <h1 class="nav-title" style="margin-bottom: 10px; " >Mi Organizador Personal</h1>
+            <ul class="nav-links">
+                <li><a href="../index.html" class="nav-link">Inicio</a></li>
+                <li><a href="plan-alimentacion.html" class="nav-link">🍎 Alimentación</a></li>
+                <li><a href="plan-gym.html" class="nav-link">💪 Gym</a></li>
+                <li><a href="magister.html" class="nav-link">🎓 Magíster</a></li>
+                <li><a href="trabajo.html" class="nav-link">💼 Trabajo</a></li>
+                <li><a href="hogar.html" class="nav-link active">🏠 Hogar</a></li>
+                <li><a href="app-ejercicios.html" class="nav-link">🏃 Ejercicios</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="page-content">
+        <div class="container">
+            <header class="page-header">
+                <h1 class="page-title">🏠 Hogar</h1>
+                <p class="page-subtitle">Gestiona las tareas domésticas y mantenimiento del hogar</p>
+            </header>
+
+            <!-- Tareas Domésticas -->
+            <section class="section">
+                <div class="section-header">
+                    <h2><span class="section-icon">✅</span> Lista de Tareas</h2>
+                    <div class="filters">
+                        <div class="filter-group">
+                            <label for="filter-task-status">Estado:</label>
+                            <select id="filter-task-status" onchange="filterTasks()">
+                                <option value="all">Todas las tareas</option>
+                                <option value="pendiente">Pendientes</option>
+                                <option value="completado">Completadas</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="filter-frequency">Frecuencia:</label>
+                            <select id="filter-frequency" onchange="filterByFrequency()">
+                                <option value="all">Todas</option>
+                                <option value="diaria">Diarias</option>
+                                <option value="semanal">Semanales</option>
+                                <option value="mensual">Mensuales</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-small" onclick="refreshHomeTasks()">🔄 Actualizar</button>
+                    </div>
+                </div>
+                <div id="lista-tareas-hogar">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <span>Cargando tareas del hogar...</span>
+                    </div>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar" id="home-tasks-progress" style="width: 0%">0% Completado</div>
+                </div>
+            </section>
+
+            <!-- Tareas por Habitación -->
+            <section class="section">
+                <div class="section-header">
+                    <h2><span class="section-icon">🏠</span> Tareas por Habitación</h2>
+                </div>
+                <div class="cards-grid">
+                    <div class="summary-card">
+                        <div class="card-icon">🛏️</div>
+                        <div class="card-content">
+                            <h3 class="card-title">Dormitorio</h3>
+                            <p class="card-description">Tareas pendientes</p>
+                            <div class="card-stats">
+                                <span class="stat" id="bedroom-tasks">0 pendientes</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon">🍳</div>
+                        <div class="card-content">
+                            <h3 class="card-title">Cocina</h3>
+                            <p class="card-description">Tareas pendientes</p>
+                            <div class="card-stats">
+                                <span class="stat" id="kitchen-tasks">0 pendientes</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon">🚿</div>
+                        <div class="card-content">
+                            <h3 class="card-title">Baño</h3>
+                            <p class="card-description">Tareas pendientes</p>
+                            <div class="card-stats">
+                                <span class="stat" id="bathroom-tasks">0 pendientes</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon">🛋️</div>
+                        <div class="card-content">
+                            <h3 class="card-title">Sala</h3>
+                            <p class="card-description">Tareas pendientes</p>
+                            <div class="card-stats">
+                                <span class="stat" id="living-tasks">0 pendientes</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Calendario de Limpieza -->
+            <section class="section">
+                <div class="section-header">
+                    <h2><span class="section-icon">📅</span> Calendario de Limpieza Semanal</h2>
+                </div>
+                <div class="table-container">
+                    <div id="calendario-limpieza">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <span>Cargando calendario de limpieza...</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Actions -->
+            <section class="quick-actions">
+                <h2 class="section-title">Acciones Rápidas</h2>
+                <div class="actions-grid">
+                    <button class="action-btn" onclick="markAllDailyComplete()">
+                        ✅ Completar Diarias
+                    </button>
+                    <button class="action-btn" onclick="addNewTask()">
+                        ➕ Agregar Tarea
+                    </button>
+                    <button class="action-btn" onclick="resetWeeklyTasks()">
+                        🔄 Reiniciar Semanales
+                    </button>
+                    <button class="action-btn" onclick="exportHomeReport()">
+                        📤 Exportar Reporte
+                    </button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Mi Organizador Personal. Un hogar ordenado, una vida ordenada.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="../js/sheets.js"></script>
+    <script src="../js/ui.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadHomeData();
+        });
+
+        async function loadHomeData() {
+            try {
+                const homeTasksData = await getSheetData(GOOGLE_SHEETS_CONFIG.SHEET_ID, 'Hogar!A1:D30');
+                renderChecklist(homeTasksData, 'lista-tareas-hogar', {
+                    headers: ['Tarea', 'Habitación', 'Frecuencia', 'Estado'],
+                    checkboxColumn: 3
+                });
+
+                // Load cleaning calendar
+                const calendarData = await getSheetData(GOOGLE_SHEETS_CONFIG.SHEET_ID, 'LimpiezaSemanal!A1:H8');
+                renderTable(calendarData, 'calendario-limpieza', {
+                    headers: ['Día', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
+                    className: 'calendar-table'
+                });
+
+                updateHomeStats(homeTasksData);
+            } catch (error) {
+                console.error('Error loading home data:', error);
+                showLoadingError('lista-tareas-hogar');
+                showLoadingError('calendario-limpieza');
+            }
+        }
+
+        function updateHomeStats(tasksData) {
+            if (!tasksData || tasksData.length <= 1) return;
+            
+            const tasks = tasksData.slice(1); // Skip header
+            const completed = tasks.filter(task => task[3] === 'completado').length;
+            const progress = Math.round((completed / tasks.length) * 100);
+            
+            updateProgressBar('home-tasks-progress', progress);
+            
+            // Count tasks by room
+            const rooms = {
+                'dormitorio': 'bedroom-tasks',
+                'cocina': 'kitchen-tasks',
+                'baño': 'bathroom-tasks',
+                'sala': 'living-tasks'
+            };
+            
+            Object.keys(rooms).forEach(room => {
+                const roomTasks = tasks.filter(task => 
+                    task[1].toLowerCase().includes(room) && task[3] === 'pendiente'
+                ).length;
+                document.getElementById(rooms[room]).textContent = `${roomTasks} pendientes`;
+            });
+        }
+
+        function updateProgressBar(elementId, percentage) {
+            const progressBar = document.getElementById(elementId);
+            progressBar.style.width = percentage + '%';
+            progressBar.textContent = percentage + '% Completado';
+        }
+
+        async function refreshHomeTasks() {
+            document.getElementById('lista-tareas-hogar').innerHTML = '<div class="loading"><div class="spinner"></div><span>Actualizando...</span></div>';
+            await loadHomeData();
+        }
+
+        function filterTasks() {
+            const filter = document.getElementById('filter-task-status').value;
+            filterChecklist('lista-tareas-hogar', 3, filter);
+        }
+
+        function filterByFrequency() {
+            const filter = document.getElementById('filter-frequency').value;
+            filterChecklist('lista-tareas-hogar', 2, filter);
+        }
+
+        function filterChecklist(containerId, columnIndex, filterValue) {
+            const container = document.getElementById(containerId);
+            const items = container.querySelectorAll('.checklist-item');
+            
+            items.forEach(item => {
+                const cells = item.querySelectorAll('span');
+                if (cells[columnIndex]) {
+                    const cellValue = cells[columnIndex].textContent.toLowerCase();
+                    const shouldShow = filterValue === 'all' || cellValue.includes(filterValue.toLowerCase());
+                    item.style.display = shouldShow ? 'flex' : 'none';
+                }
+            });
+        }
+
+        function markAllDailyComplete() {
+            if (confirm('¿Marcar todas las tareas diarias como completadas?')) {
+                console.log('Marking all daily tasks as complete');
+                loadHomeData();
+            }
+        }
+
+        function addNewTask() {
+            const task = prompt('Descripción de la tarea:');
+            const room = prompt('Habitación:');
+            const frequency = prompt('Frecuencia (diaria/semanal/mensual):');
+            
+            if (task && room && frequency) {
+                console.log('Adding new home task:', { task, room, frequency });
+                loadHomeData();
+            }
+        }
+
+        function resetWeeklyTasks() {
+            if (confirm('¿Reiniciar todas las tareas semanales?')) {
+                console.log('Resetting weekly tasks');
+                loadHomeData();
+            }
+        }
+
+        function exportHomeReport() {
+            alert('Exportando reporte del hogar...');
+        }
+
+        function showLoadingError(containerId) {
+            document.getElementById(containerId).innerHTML = 
+                '<div class="message error">Error al cargar los datos. Por favor, verifica la conexión con Google Sheets.</div>';
+        }
+    </script>
+</body>
+</html>

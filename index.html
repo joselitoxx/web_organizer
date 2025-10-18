@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Organizador Personal</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <nav class="navbar">
+        
+        
+        <div class="nav-container">
+            <h1 class="nav-title" style="margin-bottom: 10px; " >Mi Organizador Personal</h1>
+        
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-link active">Inicio</a></li>
+                <li><a href="pages/plan-alimentacion.html" class="nav-link">🍎 Alimentación</a></li>
+                <li><a href="pages/plan-gym.html" class="nav-link">💪 Gym</a></li>
+                <li><a href="pages/magister.html" class="nav-link">🎓 Magíster</a></li>
+                <li><a href="pages/trabajo.html" class="nav-link">💼 Trabajo</a></li>
+                <li><a href="pages/hogar.html" class="nav-link">🏠 Hogar</a></li>
+                <li><a href="pages/app-ejercicios.html" class="nav-link">🏃 Ejercicios</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <header class="page-header">
+                <h1 class="page-title">Mi Organizador Personal</h1>
+                <p class="page-subtitle">Gestiona todos los aspectos de tu vida de manera organizada y eficiente</p>
+            </header>
+
+            <!-- Summary Cards Grid -->
+            <div class="cards-grid">
+                <div class="summary-card" onclick="window.location.href='pages/plan-alimentacion.html'">
+                    <div class="card-icon">🍎</div>
+                    <div class="card-content">
+                        <h3 class="card-title">Alimentación</h3>
+                        <p class="card-description">Plan semanal de comidas y lista de supermercado</p>
+                        <div class="card-stats" id="alimentacion-stats">
+                            <span class="stat">7 comidas planificadas</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="summary-card" onclick="window.location.href='pages/plan-gym.html'">
+                    <div class="card-icon">💪</div>
+                    <div class="card-content">
+                        <h3 class="card-title">Gimnasio</h3>
+                        <p class="card-description">Rutinas de ejercicios caseros y de gimnasio</p>
+                        <div class="card-stats" id="gym-stats">
+                            <span class="stat">5 ejercicios pendientes</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="summary-card" onclick="window.location.href='pages/magister.html'">
+                    <div class="card-icon">🎓</div>
+                    <div class="card-content">
+                        <h3 class="card-title">Magíster</h3>
+                        <p class="card-description">Seguimiento de clases y progreso académico</p>
+                        <div class="card-stats" id="magister-stats">
+                            <span class="stat">3 clases pendientes</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="summary-card" onclick="window.location.href='pages/trabajo.html'">
+                    <div class="card-icon">💼</div>
+                    <div class="card-content">
+                        <h3 class="card-title">Trabajo</h3>
+                        <p class="card-description">Proyectos de optimizador y desarrollo backend</p>
+                        <div class="card-stats" id="trabajo-stats">
+                            <span class="stat">75% completado</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="summary-card" onclick="window.location.href='pages/hogar.html'">
+                    <div class="card-icon">🏠</div>
+                    <div class="card-content">
+                        <h3 class="card-title">Hogar</h3>
+                        <p class="card-description">Tareas domésticas y mantenimiento del hogar</p>
+                        <div class="card-stats" id="hogar-stats">
+                            <span class="stat">4 tareas pendientes</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="summary-card" onclick="window.location.href='pages/app-ejercicios.html'">
+                    <div class="card-icon">🏃</div>
+                    <div class="card-content">
+                        <h3 class="card-title">Base de Ejercicios</h3>
+                        <p class="card-description">Catálogo completo de ejercicios por grupo muscular</p>
+                        <div class="card-stats" id="ejercicios-stats">
+                            <span class="stat">50+ ejercicios disponibles</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <section class="quick-actions">
+                <h2 class="section-title">Acciones Rápidas</h2>
+                <div class="actions-grid">
+                    <button class="action-btn" onclick="refreshAllData()">
+                        🔄 Actualizar Datos
+                    </button>
+                    <button class="action-btn" onclick="exportData()">
+                        📊 Exportar Resumen
+                    </button>
+                    <button class="action-btn" onclick="showSettings()">
+                        ⚙️ Configuración
+                    </button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Mi Organizador Personal. Diseñado para una vida más organizada.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/sheets.js"></script>
+    <script src="js/ui.js"></script>
+    <script>
+        // Initialize dashboard with summary data
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadDashboardSummary();
+        });
+
+        async function loadDashboardSummary() {
+            // Load summary statistics for each section
+            try {
+                // This will be populated when Google Sheets integration is ready
+                console.log('Dashboard loaded - ready for Google Sheets integration');
+            } catch (error) {
+                console.error('Error loading dashboard summary:', error);
+            }
+        }
+
+        function refreshAllData() {
+            loadDashboardSummary();
+            alert('Datos actualizados correctamente');
+        }
+
+        function exportData() {
+            alert('Función de exportación en desarrollo');
+        }
+
+        function showSettings() {
+            alert('Configuración en desarrollo');
+        }
+    </script>
+</body>
+</html>

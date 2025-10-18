@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base de Ejercicios - Mi Organizador Personal</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <h1 class="nav-title" style="margin-bottom: 10px; " >Mi Organizador Personal</h1>
+            <ul class="nav-links">
+                <li><a href="../index.html" class="nav-link">Inicio</a></li>
+                <li><a href="plan-alimentacion.html" class="nav-link">🍎 Alimentación</a></li>
+                <li><a href="plan-gym.html" class="nav-link">💪 Gym</a></li>
+                <li><a href="magister.html" class="nav-link">🎓 Magíster</a></li>
+                <li><a href="trabajo.html" class="nav-link">💼 Trabajo</a></li>
+                <li><a href="hogar.html" class="nav-link">🏠 Hogar</a></li>
+                <li><a href="app-ejercicios.html" class="nav-link active">🏃 Ejercicios</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="page-content">
+        <div class="container">
+            <header class="page-header">
+                <h1 class="page-title">🏃 Base de Ejercicios</h1>
+                <p class="page-subtitle">Catálogo completo de ejercicios organizados por grupo muscular</p>
+            </header>
+
+            <!-- Filtros de Búsqueda -->
+            <section class="section">
+                <div class="section-header">
+                    <h2><span class="section-icon">🔍</span> Búsqueda y Filtros</h2>
+                </div>
+                <div class="filters">
+                    <div class="filter-group">
+                        <label for="search-exercise">Buscar ejercicio:</label>
+                        <input type="text" id="search-exercise" placeholder="Nombre del ejercicio..." oninput="searchExercises()">
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-muscle-group">Grupo muscular:</label>
+                        <select id="filter-muscle-group" onchange="filterByMuscleGroup()">
+                            <option value="all">Todos los grupos</option>
+                            <option value="pecho">Pecho</option>
+                            <option value="espalda">Espalda</option>
+                            <option value="piernas">Piernas</option>
+                            <option value="hombros">Hombros</option>
+                            <option value="brazos">Brazos</option>
+                            <option value="core">Core</option>
+                            <option value="cardio">Cardio</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-level">Nivel:</label>
+                        <select id="filter-level" onchange="filterByLevel()">
+                            <option value="all">Todos los niveles</option>
+                            <option value="principiante">Principiante</option>
+                            <option value="intermedio">Intermedio</option>
+                            <option value="avanzado">Avanzado</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-equipment">Equipamiento:</label>
+                        <select id="filter-equipment" onchange="filterByEquipment()">
+                            <option value="all">Cualquier equipamiento</option>
+                            <option value="sin equipo">Sin equipo</option>
+                            <option value="mancuernas">Mancuernas</option>
+                            <option value="barra">Barra</option>
+                            <option value="máquina">Máquina</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-small" onclick="refreshExerciseDB()">🔄 Actualizar</button>
+                    <button class="btn btn-small btn-secondary" onclick="clearFilters()">🗑️ Limpiar Filtros</button>
+                </div>
+            </section>
+
+            <!-- Base de Ejercicios -->
+            <section class="section">
+                <div class="section-header">
+                    <h2><span class="section-icon">📋</span> Catálogo de Ejercicios</h2>
+                    <div class="filters">
+                        <span id="exercise-count">Mostrando 0 ejercicios</span>
+                        <button class="btn btn-small btn-secondary" onclick="addCustomExercise()">➕ Agregar Ejercicio</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <div id="tabla-ejercicios">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <span>Cargando base de ejercicios...</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Estadísticas de la Base -->
+            <section class="section">
+                <div class="section-header">
+                    <h2><span class="section-icon">📊</span> Estadísticas de la Base</h2>
+                </div>
+                <div class="cards-grid">
+                    <div class="summary-card">
+                        <div class="card-icon">💪</div>
+                        <div class="card-content">
+                            <h3 class="card-title">Total Ejercicios</h3>
+                            <p class="card-description">En la base de datos</p>
+                            <div class="card-stats">
+                                <span class="stat" id="total-exercises">0 ejercicios</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon">🎯</div>
+                        <div class="card-content">
+                            <h3 class="card-title">Grupos Musculares</h3>
+                            <p class="card-description">Disponibles</p>
+                            <div class="card-stats">
+                                <span class="stat" id="muscle-groups">0 grupos</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon">🏋️</div>
+                        <div class="card-content">
+                            <h3 class="card-title">Equipamiento</h3>
+                            <p class="card-description">Tipos disponibles</p>
+                            <div class="card-stats">
+                                <span class="stat" id="equipment-types">0 tipos</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon">⭐</div>
+                        <div class="card-content">
+                            <h3 class="card-title">Favoritos</h3>
+                            <p class="card-description">Ejercicios marcados</p>
+                            <div class="card-stats">
+                                <span class="stat" id="favorite-exercises">0 favoritos</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Ejercicios por Grupo Muscular -->
+            <section class="section">
+                <div class="section-header">
+                    <h2><span class="section-icon">🎯</span> Distribución por Grupo Muscular</h2>
+                </div>
+                <div class="cards-grid" id="muscle-group-distribution">
+                    <!-- Las tarjetas se generarán dinámicamente -->
+                </div>
+            </section>
+
+            <!-- Quick Actions -->
+            <section class="quick-actions">
+                <h2 class="section-title">Acciones Rápidas</h2>
+                <div class="actions-grid">
+                    <button class="action-btn" onclick="createCustomRoutine()">
+                        📋 Crear Rutina
+                    </button>
+                    <button class="action-btn" onclick="exportExerciseList()">
+                        📤 Exportar Lista
+                    </button>
+                    <button class="action-btn" onclick="importExercises()">
+                        📥 Importar Ejercicios
+                    </button>
+                    <button class="action-btn" onclick="exerciseRandomizer()">
+                        🎲 Ejercicio Aleatorio
+                    </button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Mi Organizador Personal. Tu biblioteca personal de ejercicios.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="../js/sheets.js"></script>
+    <script src="../js/ui.js"></script>
+    <script>
+        let allExercises = [];
+        let filteredExercises = [];
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadExerciseDatabase();
+        });
+
+        async function loadExerciseDatabase() {
+            try {
+                const exerciseData = await getSheetData(GOOGLE_SHEETS_CONFIG.SHEET_ID, 'Ejercicios!A1:F100');
+                allExercises = exerciseData.slice(1); // Remove header
+                filteredExercises = [...allExercises];
+                
+                renderExerciseTable();
+                updateExerciseStats();
+                updateMuscleGroupDistribution();
+            } catch (error) {
+                console.error('Error loading exercise database:', error);
+                showLoadingError('tabla-ejercicios');
+            }
+        }
+
+        function renderExerciseTable() {
+            const tableData = [
+                ['Ejercicio', 'Grupo Muscular', 'Nivel', 'Equipamiento', 'Descripción', 'Favorito'],
+                ...filteredExercises
+            ];
+            
+            renderTable(tableData, 'tabla-ejercicios', {
+                headers: ['Ejercicio', 'Grupo Muscular', 'Nivel', 'Equipamiento', 'Descripción', 'Favorito'],
+                className: 'exercises-database-table',
+                actionColumn: 5,
+                actionCallback: toggleFavorite
+            });
+            
+            document.getElementById('exercise-count').textContent = `Mostrando ${filteredExercises.length} ejercicios`;
+        }
+
+        function updateExerciseStats() {
+            // Total exercises
+            document.getElementById('total-exercises').textContent = `${allExercises.length} ejercicios`;
+            
+            // Unique muscle groups
+            const uniqueMuscleGroups = [...new Set(allExercises.map(ex => ex[1]))];
+            document.getElementById('muscle-groups').textContent = `${uniqueMuscleGroups.length} grupos`;
+            
+            // Equipment types
+            const uniqueEquipment = [...new Set(allExercises.map(ex => ex[3]))];
+            document.getElementById('equipment-types').textContent = `${uniqueEquipment.length} tipos`;
+            
+            // Favorite exercises
+            const favorites = allExercises.filter(ex => ex[5] === 'Sí').length;
+            document.getElementById('favorite-exercises').textContent = `${favorites} favoritos`;
+        }
+
+        function updateMuscleGroupDistribution() {
+            const muscleGroups = {};
+            allExercises.forEach(exercise => {
+                const group = exercise[1];
+                muscleGroups[group] = (muscleGroups[group] || 0) + 1;
+            });
+            
+            const container = document.getElementById('muscle-group-distribution');
+            container.innerHTML = '';
+            
+            Object.entries(muscleGroups).forEach(([group, count]) => {
+                const card = document.createElement('div');
+                card.className = 'summary-card';
+                card.innerHTML = `
+                    <div class="card-icon">${getMuscleGroupIcon(group)}</div>
+                    <div class="card-content">
+                        <h3 class="card-title">${group}</h3>
+                        <p class="card-description">Ejercicios disponibles</p>
+                        <div class="card-stats">
+                            <span class="stat">${count} ejercicios</span>
+                        </div>
+                    </div>
+                `;
+                card.onclick = () => filterBySpecificMuscleGroup(group);
+                container.appendChild(card);
+            });
+        }
+
+        function getMuscleGroupIcon(group) {
+            const icons = {
+                'pecho': '💪',
+                'espalda': '🦵',
+                'piernas': '🦵',
+                'hombros': '🤲',
+                'brazos': '💪',
+                'core': '🤸',
+                'cardio': '🏃'
+            };
+            return icons[group.toLowerCase()] || '💪';
+        }
+
+        function searchExercises() {
+            const searchTerm = document.getElementById('search-exercise').value.toLowerCase();
+            applyAllFilters();
+        }
+
+        function filterByMuscleGroup() {
+            applyAllFilters();
+        }
+
+        function filterByLevel() {
+            applyAllFilters();
+        }
+
+        function filterByEquipment() {
+            applyAllFilters();
+        }
+
+        function filterBySpecificMuscleGroup(group) {
+            document.getElementById('filter-muscle-group').value = group.toLowerCase();
+            applyAllFilters();
+        }
+
+        function applyAllFilters() {
+            const searchTerm = document.getElementById('search-exercise').value.toLowerCase();
+            const muscleGroup = document.getElementById('filter-muscle-group').value;
+            const level = document.getElementById('filter-level').value;
+            const equipment = document.getElementById('filter-equipment').value;
+            
+            filteredExercises = allExercises.filter(exercise => {
+                const matchesSearch = !searchTerm || exercise[0].toLowerCase().includes(searchTerm);
+                const matchesMuscleGroup = muscleGroup === 'all' || exercise[1].toLowerCase() === muscleGroup;
+                const matchesLevel = level === 'all' || exercise[2].toLowerCase() === level;
+                const matchesEquipment = equipment === 'all' || exercise[3].toLowerCase().includes(equipment);
+                
+                return matchesSearch && matchesMuscleGroup && matchesLevel && matchesEquipment;
+            });
+            
+            renderExerciseTable();
+        }
+
+        function clearFilters() {
+            document.getElementById('search-exercise').value = '';
+            document.getElementById('filter-muscle-group').value = 'all';
+            document.getElementById('filter-level').value = 'all';
+            document.getElementById('filter-equipment').value = 'all';
+            
+            filteredExercises = [...allExercises];
+            renderExerciseTable();
+        }
+
+        function toggleFavorite(rowIndex, data) {
+            const currentFavorite = data[5];
+            const newFavorite = currentFavorite === 'Sí' ? 'No' : 'Sí';
+            
+            console.log(`Toggling favorite for exercise ${data[0]}: ${newFavorite}`);
+            
+            // Update in the data array
+            const exerciseIndex = allExercises.findIndex(ex => ex[0] === data[0]);
+            if (exerciseIndex !== -1) {
+                allExercises[exerciseIndex][5] = newFavorite;
+            }
+            
+            applyAllFilters();
+            updateExerciseStats();
+        }
+
+        async function refreshExerciseDB() {
+            document.getElementById('tabla-ejercicios').innerHTML = '<div class="loading"><div class="spinner"></div><span>Actualizando base de ejercicios...</span></div>';
+            await loadExerciseDatabase();
+        }
+
+        function addCustomExercise() {
+            const exercise = prompt('Nombre del ejercicio:');
+            const muscleGroup = prompt('Grupo muscular:');
+            const level = prompt('Nivel (principiante/intermedio/avanzado):');
+            const equipment = prompt('Equipamiento necesario:');
+            const description = prompt('Descripción breve:');
+            
+            if (exercise && muscleGroup && level && equipment) {
+                console.log('Adding custom exercise:', { exercise, muscleGroup, level, equipment, description });
+                
+                // Add to local array
+                allExercises.push([exercise, muscleGroup, level, equipment, description || '', 'No']);
+                applyAllFilters();
+                updateExerciseStats();
+                updateMuscleGroupDistribution();
+            }
+        }
+
+        function createCustomRoutine() {
+            const selectedExercises = [];
+            // Logic to select exercises for routine
+            alert('Función de creación de rutina personalizada en desarrollo');
+        }
+
+        function exportExerciseList() {
+            alert('Exportando lista de ejercicios...');
+        }
+
+        function importExercises() {
+            alert('Función de importación en desarrollo');
+        }
+
+        function exerciseRandomizer() {
+            if (filteredExercises.length === 0) {
+                alert('No hay ejercicios disponibles con los filtros actuales');
+                return;
+            }
+            
+            const randomExercise = filteredExercises[Math.floor(Math.random() * filteredExercises.length)];
+            alert(`Ejercicio sugerido: ${randomExercise[0]}\nGrupo: ${randomExercise[1]}\nNivel: ${randomExercise[2]}\n\n${randomExercise[4]}`);
+        }
+
+        function showLoadingError(containerId) {
+            document.getElementById(containerId).innerHTML = 
+                '<div class="message error">Error al cargar los datos. Por favor, verifica la conexión con Google Sheets.</div>';
+        }
+    </script>
+</body>
+</html>
