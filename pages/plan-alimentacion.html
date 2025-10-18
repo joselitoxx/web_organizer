@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plan de Alimentación - Mi Organizador Personal</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/style.css?v=11">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -12,15 +12,9 @@
     <!-- Navigation Header -->
     <nav class="navbar">
         <div class="nav-container">
-            <h1 class="nav-title" style="margin-bottom: 10px; " >Mi Organizador Personal</h1>
+            <h1 class="nav-title" style="margin-bottom: 10px; " >Plan de Alimentación</h1>
             <ul class="nav-links">
-                <li><a href="../index.html" class="nav-link">Inicio</a></li>
-                <li><a href="plan-alimentacion.html" class="nav-link active">🍎 Alimentación</a></li>
-                <li><a href="plan-gym.html" class="nav-link">💪 Gym</a></li>
-                <li><a href="magister.html" class="nav-link">🎓 Magíster</a></li>
-                <li><a href="trabajo.html" class="nav-link">💼 Trabajo</a></li>
-                <li><a href="hogar.html" class="nav-link">🏠 Hogar</a></li>
-                <li><a href="app-ejercicios.html" class="nav-link">🏃 Ejercicios</a></li>
+                <li><a href="plan-alimentacion.html" class="nav-link active" data-icon="🍎">Alimentación</a></li>
             </ul>
         </div>
     </nav>
@@ -28,22 +22,35 @@
     <!-- Main Content -->
     <main class="page-content">
         <div class="container">
-            <header class="page-header">
-                <h1 class="page-title">🍎 Plan de Alimentación</h1>
-                <p class="page-subtitle">Gestiona tu plan semanal de comidas y lista de supermercado</p>
-            </header>
+            <!-- Hero Section -->
+            <section class="hero-section">
+                <div class="hero-banner">
+                    <div class="hero-heading">
+                        <h1 class="hero-title">🍎 Plan de Alimentación</h1>
+                        <p class="hero-subtitle">Gestiona tu plan semanal de comidas y lista de supermercado</p>
+                    </div>
+                </div>
+            </section>
 
             <!-- Calendario Semanal de Comidas -->
             <section class="section">
-                <div class="section-header">
+                <div class="section-header section-header-collapsible" onclick="toggleWeeklyCalendar(event)">
                     <h2><span class="section-icon">📅</span> Calendario Semanal</h2>
-                    <button class="btn btn-small" onclick="refreshMealsData()">🔄 Actualizar</button>
+                    <div>
+                        <button class="btn btn-small" onclick="event.stopPropagation(); refreshMealsData()">🔄</button>
+                        <span class="collapse-icon" id="calendar-collapse-icon">▼</span>
+                    </div>
                 </div>
-                <div class="table-container">
-                    <div id="tabla-comidas">
-                        <div class="loading">
-                            <div class="spinner"></div>
-                            <span>Cargando plan de comidas...</span>
+                <div class="section-body section-body-collapsible" id="weekly-calendar-body" style="display: none;">
+                    <p class="section-description">Visualiza tu menú de la semana y mantén presente qué toca cada día.</p>
+                    <div class="collapsible-content" id="weekly-calendar-content">
+                        <div class="table-container">
+                            <div id="tabla-comidas">
+                                <div class="loading">
+                                    <div class="spinner"></div>
+                                    <span>Cargando plan de comidas...</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -53,22 +60,70 @@
             <section class="section">
                 <div class="section-header">
                     <h2><span class="section-icon">🛒</span> Lista de Supermercado</h2>
-                    <div class="filters">
-                        <div class="filter-group">
-                            <label for="filter-status">Filtrar por:</label>
-                            <select id="filter-status" onchange="filterShoppingList()">
-                                <option value="all">Todos los productos</option>
-                                <option value="pending">Pendientes</option>
-                                <option value="bought">Comprados</option>
-                            </select>
-                        </div>
-                        <button class="btn btn-small btn-secondary" onclick="addNewItem()">➕ Agregar</button>
+                    <div>
+                        <select id="filter-status" onchange="filterShoppingList()" class="filter-select">
+                            <option value="all">Todos</option>
+                            <option value="pending">Pendientes</option>
+                            <option value="bought">Comprados</option>
+                        </select>
+                        <button class="btn btn-small btn-secondary" onclick="addNewItem()">➕</button>
                     </div>
                 </div>
-                <div id="lista-supermercado">
-                    <div class="loading">
-                        <div class="spinner"></div>
-                        <span>Cargando lista de supermercado...</span>
+                <div class="section-body">
+                    <p class="section-description">Gestiona tus compras pendientes y marca lo que ya está en tu despensa.</p>
+                    <div class="section-metrics" id="shopping-overview">
+                        <div class="metric-card">
+                            <span class="metric-label">Total</span>
+                            <span class="metric-value" id="shopping-total">--</span>
+                        </div>
+                        <div class="metric-card">
+                            <span class="metric-label">Pendientes</span>
+                            <span class="metric-value" id="shopping-pending">--</span>
+                        </div>
+                        <div class="metric-card">
+                            <span class="metric-label">Comprados</span>
+                            <span class="metric-value" id="shopping-bought">--</span>
+                        </div>
+                    </div>
+                    <div id="lista-supermercado">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <span>Cargando lista de supermercado...</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Plan del Día -->
+            <section class="section">
+                <div class="section-header">
+                    <h2><span class="section-icon">🍽️</span> Mi Plan del Día</h2>
+                    <div>
+                        <button class="btn btn-small btn-secondary" onclick="openAddMealModal()">➕</button>
+                        <button class="btn btn-small" onclick="refreshDailyPlan()">🔄</button>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <p class="section-description">Mantén al día tus comidas programadas y marca las que ya disfrutaste.</p>
+                    <div class="section-metrics" id="daily-overview">
+                        <div class="metric-card">
+                            <span class="metric-label">Programadas</span>
+                            <span class="metric-value" id="daily-total-meals">--</span>
+                        </div>
+                        <div class="metric-card">
+                            <span class="metric-label">Pendientes</span>
+                            <span class="metric-value" id="daily-pending-meals">--</span>
+                        </div>
+                        <div class="metric-card">
+                            <span class="metric-label">Consumidas</span>
+                            <span class="metric-value" id="daily-consumed-meals">--</span>
+                        </div>
+                    </div>
+                    <div id="plan-del-dia">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <span>Cargando plan del día...</span>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -78,34 +133,37 @@
                 <div class="section-header">
                     <h2><span class="section-icon">📊</span> Estadísticas de la Semana</h2>
                 </div>
-                <div class="cards-grid" id="nutrition-stats">
-                    <div class="summary-card">
-                        <div class="card-icon">🥗</div>
-                        <div class="card-content">
-                            <h3 class="card-title">Comidas Balanceadas</h3>
-                            <p class="card-description">Esta semana</p>
-                            <div class="card-stats">
-                                <span class="stat" id="balanced-meals">0/21 comidas</span>
+                <div class="section-body">
+                    <p class="section-description">Haz seguimiento de tus objetivos saludables y visualiza tus avances semanales.</p>
+                    <div class="cards-grid" id="nutrition-stats">
+                        <div class="summary-card">
+                            <div class="card-icon">🥗</div>
+                            <div class="card-content">
+                                <h3 class="card-title">Comidas Balanceadas</h3>
+                                <p class="card-description">Esta semana</p>
+                                <div class="card-stats">
+                                    <span class="stat" id="balanced-meals">0/21 comidas</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="summary-card">
-                        <div class="card-icon">💧</div>
-                        <div class="card-content">
-                            <h3 class="card-title">Hidratación</h3>
-                            <p class="card-description">Vasos de agua diarios</p>
-                            <div class="card-stats">
-                                <span class="stat" id="water-intake">0/8 vasos</span>
+                        <div class="summary-card">
+                            <div class="card-icon">💧</div>
+                            <div class="card-content">
+                                <h3 class="card-title">Hidratación</h3>
+                                <p class="card-description">Vasos de agua diarios</p>
+                                <div class="card-stats">
+                                    <span class="stat" id="water-intake">0/8 vasos</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="summary-card">
-                        <div class="card-icon">🛒</div>
-                        <div class="card-content">
-                            <h3 class="card-title">Lista de Compras</h3>
-                            <p class="card-description">Progreso de compras</p>
-                            <div class="card-stats">
-                                <span class="stat" id="shopping-progress">0% completado</span>
+                        <div class="summary-card">
+                            <div class="card-icon">🛒</div>
+                            <div class="card-content">
+                                <h3 class="card-title">Lista de Compras</h3>
+                                <p class="card-description">Progreso de compras</p>
+                                <div class="card-stats">
+                                    <span class="stat" id="shopping-progress">0% completado</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -113,18 +171,29 @@
             </section>
 
             <!-- Quick Actions -->
-            <section class="quick-actions">
-                <h2 class="section-title">Acciones Rápidas</h2>
-                <div class="actions-grid">
-                    <button class="action-btn" onclick="planNextWeek()">
-                        📋 Planificar Próxima Semana
-                    </button>
-                    <button class="action-btn" onclick="generateShoppingList()">
-                        🛍️ Generar Lista de Compras
-                    </button>
-                    <button class="action-btn" onclick="exportMealPlan()">
-                        📤 Exportar Plan
-                    </button>
+            <section class="section quick-actions quick-actions-section">
+                <div class="section-header">
+                    <h2 class="section-title"><span class="section-icon">⚡</span> Acciones Rápidas</h2>
+                </div>
+                <div class="section-body">
+                    <p class="section-description">Accede a atajos útiles para mantener tu plan organizado sin perder tiempo.</p>
+                    <div class="actions-grid quick-actions-grid">
+                        <button type="button" class="action-btn quick-action-card" onclick="planNextWeek()">
+                            <span class="quick-action-icon">📋</span>
+                            <span class="quick-action-text">Planificar próxima semana</span>
+                            <span class="quick-action-subtitle">Organiza tu menú con anticipación.</span>
+                        </button>
+                        <button type="button" class="action-btn quick-action-card" onclick="generateShoppingList()">
+                            <span class="quick-action-icon">🛍️</span>
+                            <span class="quick-action-text">Generar lista de compras</span>
+                            <span class="quick-action-subtitle">Obtén lo esencial para tus comidas.</span>
+                        </button>
+                        <button type="button" class="action-btn quick-action-card" onclick="exportMealPlan()">
+                            <span class="quick-action-icon">📤</span>
+                            <span class="quick-action-text">Exportar plan</span>
+                            <span class="quick-action-subtitle">Guarda o comparte tu planificación.</span>
+                        </button>
+                    </div>
                 </div>
             </section>
         </div>
@@ -137,10 +206,114 @@
         </div>
     </footer>
 
+    <!-- Modal para agregar nuevo producto -->
+    <div id="addProductModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>➕ Agregar Producto</h2>
+                <span class="close-modal" onclick="closeAddModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="addProductForm">
+                    <div class="form-group">
+                        <label for="productName">Producto *</label>
+                        <input type="text" id="productName" required placeholder="Ej: Manzanas">
+                    </div>
+                    <div class="form-group">
+                        <label for="productQuantity">Cantidad *</label>
+                        <input type="text" id="productQuantity" required placeholder="Ej: 2 kg">
+                    </div>
+                    <div class="form-group">
+                        <label for="productCategory">Categoría *</label>
+                        <select id="productCategory" required>
+                            <option value="">Seleccionar categoría</option>
+                            <option value="alimentos">Alimentos</option>
+                            <option value="limpieza">Limpieza</option>
+                            <option value="hogar">Hogar</option>
+                            <option value="farmacos">Fármacos</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="closeAddModal()">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Agregar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para agregar/editar comida -->
+    <div id="addMealModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="mealModalTitle">➕ Agregar Comida</h2>
+                <span class="close-modal" onclick="closeMealModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="addMealForm">
+                    <input type="hidden" id="mealRowIndex" value="">
+                    
+                    <div class="form-group">
+                        <label for="mealDay">Día *</label>
+                        <select id="mealDay" required>
+                            <option value="">Seleccionar día</option>
+                            <option value="Lunes">Lunes</option>
+                            <option value="Martes">Martes</option>
+                            <option value="Miércoles">Miércoles</option>
+                            <option value="Jueves">Jueves</option>
+                            <option value="Viernes">Viernes</option>
+                            <option value="Sábado">Sábado</option>
+                            <option value="Domingo">Domingo</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="mealTime">Hora *</label>
+                        <input type="time" id="mealTime" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="mealType">Tipo de Comida *</label>
+                        <select id="mealType" required>
+                            <option value="">Seleccionar tipo</option>
+                            <option value="Desayuno">🥐 Desayuno</option>
+                            <option value="Media Mañana">🍎 Media Mañana</option>
+                            <option value="Almuerzo">🍽️ Almuerzo</option>
+                            <option value="Merienda">☕ Merienda</option>
+                            <option value="Cena">🌙 Cena</option>
+                            <option value="Colación">🥤 Colación</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="mealFoods">Alimentos y Porciones *</label>
+                        <div id="foodsList" class="foods-list">
+                            <!-- Los alimentos se agregarán aquí dinámicamente -->
+                        </div>
+                        <button type="button" class="btn btn-secondary btn-add-food" onclick="addFoodField()">
+                            ➕ Agregar Alimento
+                        </button>
+                        <small style="color: #64748b; display: block; margin-top: 0.5rem;">
+                            💡 Tip: Especifica las porciones (ej: "200g", "1 taza", "2 unidades")
+                        </small>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="closeMealModal()">Cancelar</button>
+                        <button type="submit" class="btn btn-primary" id="mealSubmitBtn">Agregar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
-    <script src="../js/sheets.js?v=8"></script>
-    <script src="../js/ui.js?v=8"></script>
+    <script src="../js/sheets.js?v=10"></script>
+    <script src="../js/ui.js?v=24"></script>
     <script>
+        // Variable global para almacenar los datos completos de supermercado
+        let fullShoppingData = [];
+
         // Initialize page data
         document.addEventListener('DOMContentLoaded', async function() {
             await loadMealPlanData();
@@ -151,12 +324,9 @@
             window.currentChecklistSheetName = 'Supermercado';
 
             try {
-                // Load meal plan table
-                const mealsData = await getSheetData(GOOGLE_SHEETS_CONFIG.SHEET_ID, 'Comidas');
-                renderTable(mealsData, 'tabla-comidas', {
-                    headers: ['Día', 'Desayuno', 'Almuerzo', 'Cena'],
-                    className: 'meals-table'
-                });
+                // Load weekly meal plan from PlanDiario
+                const dailyPlanData = await getSheetData(GOOGLE_SHEETS_CONFIG.SHEET_ID, 'PlanDiario');
+                renderWeeklyCalendar(dailyPlanData);
 
                 // Load shopping list
                 const shoppingData = await getSheetData(GOOGLE_SHEETS_CONFIG.SHEET_ID, 'Supermercado');
@@ -201,46 +371,250 @@
                     }
                 });
                 
-                renderChecklist(alimentosData, 'lista-supermercado', {
-                    headers: ['Producto', 'Cantidad', 'Estado', 'Categoría', 'Fecha'],
-                    checkboxColumn: 2,
-                    showHeaders: true,
-                    asTable: true
-                });
+                // Guardar datos completos para filtrado y métricas de la lista
+                fullShoppingData = alimentosData;
+
+                const alimentosStats = getShoppingStatsFromData(alimentosData);
+                updateShoppingOverview(alimentosStats);
+                updateHeroShoppingStatus(alimentosStats);
+
+                // Aplicar filtro actual
+                applyCurrentFilter();
+
+                // Load daily plan
+                await loadDailyPlan();
 
                 // Update statistics
-                updateNutritionStats(mealsData, shoppingData);
+                updateNutritionStats(dailyPlanData, shoppingData);
             } catch (error) {
                 console.error('Error loading meal plan data:', error);
                 showLoadingError('tabla-comidas');
                 showLoadingError('lista-supermercado');
+                updateShoppingOverview({ total: 0, pending: 0, bought: 0 });
+                updateHeroShoppingStatus({ total: 0, pending: 0, bought: 0 });
             }
         }
 
         function updateNutritionStats(mealsData, shoppingData) {
-            // Update balanced meals count
+            // Update balanced meals count based on daily plan
             const balancedMeals = calculateBalancedMeals(mealsData);
-            document.getElementById('balanced-meals').textContent = `${balancedMeals}/21 comidas`;
+            document.getElementById('balanced-meals').textContent = `${balancedMeals}/35 comidas`;
             
             // Update water intake (this would come from another sheet or manual input)
             document.getElementById('water-intake').textContent = '6/8 vasos';
             
             // Update shopping progress
-            const shoppingProgress = calculateShoppingProgress(shoppingData);
-            document.getElementById('shopping-progress').textContent = `${shoppingProgress}% completado`;
+            const shoppingMetrics = getShoppingMetrics(shoppingData);
+            document.getElementById('shopping-progress').textContent = `${shoppingMetrics.progress}% completado`;
         }
 
-        function calculateBalancedMeals(mealsData) {
-            // Logic to determine balanced meals
-            return Math.floor(Math.random() * 21); // Placeholder
-        }
-
-        function calculateShoppingProgress(shoppingData) {
-            if (!shoppingData || shoppingData.length <= 1) return 0;
+    function calculateBalancedMeals(dailyPlanData) {
+            if (!dailyPlanData || dailyPlanData.length <= 1) return 0;
             
-            const items = shoppingData.slice(1); // Skip header
-            const completedItems = items.filter(item => item[2] === 'Comprado').length;
-            return Math.round((completedItems / items.length) * 100);
+            // Contar comidas consumidas en la semana
+            let consumidas = 0;
+            dailyPlanData.slice(1).forEach(row => {
+                const estado = row[4]?.toString().toLowerCase();
+                if (estado === 'consumido') {
+                    consumidas++;
+                }
+            });
+            
+            return consumidas;
+        }
+
+        function renderWeeklyCalendar(dailyPlanData) {
+            const container = document.getElementById('tabla-comidas');
+            
+            if (!dailyPlanData || dailyPlanData.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #94a3b8; padding: 2rem;">No hay datos disponibles</p>';
+                return;
+            }
+            
+            // Organizar datos por día y tipo de comida
+            const diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+            const tiposComida = ['Desayuno', 'Media Mañana', 'Almuerzo', 'Merienda', 'Cena'];
+            
+            const calendario = {};
+            diasSemana.forEach(dia => {
+                calendario[dia] = {};
+                tiposComida.forEach(tipo => {
+                    calendario[dia][tipo] = [];
+                });
+            });
+            
+            // Llenar calendario con datos
+            dailyPlanData.slice(1).forEach(row => {
+                const dia = row[0];
+                const hora = row[1];
+                const tipoComida = row[2];
+                const alimentos = row[3];
+                const estado = row[4]?.toString().toLowerCase() || 'pendiente';
+                
+                if (calendario[dia] && calendario[dia][tipoComida]) {
+                    calendario[dia][tipoComida].push({
+                        hora,
+                        alimentos,
+                        estado
+                    });
+                }
+            });
+            
+            // Obtener día actual
+            const hoy = diasSemana[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1];
+            
+            // Dividir días en 2 filas: Lunes-Jueves y Viernes-Domingo
+            const fila1 = ['Lunes', 'Martes', 'Miércoles', 'Jueves'];
+            const fila2 = ['Viernes', 'Sábado', 'Domingo'];
+            
+            // Renderizar tabla estilo menú
+            let html = `
+                <div class="menu-table-wrapper">
+                    <div class="menu-header-banner">
+                        <h2 class="menu-title">PROPUESTAS DE MENÚS DIARIOS<br>PARA UNA DIETA SALUDABLE</h2>
+                    </div>
+            `;
+            
+            // Primera fila (Lunes a Jueves)
+            html += `<div class="menu-grid menu-grid-row1">`;
+            
+            fila1.forEach(dia => {
+                html += renderDayColumn(dia, calendario[dia], hoy, tiposComida);
+            });
+            
+            html += `</div>`;
+            
+            // Segunda fila (Viernes a Domingo)
+            html += `<div class="menu-grid menu-grid-row2">`;
+            
+            fila2.forEach(dia => {
+                html += renderDayColumn(dia, calendario[dia], hoy, tiposComida);
+            });
+            
+            html += `</div></div>`;
+            
+            container.innerHTML = html;
+        }
+        
+        function renderDayColumn(dia, comidas, hoy, tiposComida) {
+            const isToday = dia === hoy;
+            let html = `
+                <div class="menu-day-column ${isToday ? 'menu-today' : ''}">
+                    <div class="menu-day-header">
+                        <h3>${dia.toUpperCase()}</h3>
+                        ${isToday ? '<span class="menu-today-badge">HOY</span>' : ''}
+                    </div>
+                    <div class="menu-meals-list">
+            `;
+            
+            tiposComida.forEach(tipo => {
+                const meals = comidas[tipo];
+                const icon = getMealIcon(tipo);
+                
+                html += `
+                    <div class="menu-meal-block">
+                        <div class="menu-meal-header">
+                            <span class="menu-meal-icon">${icon}</span>
+                            <span class="menu-meal-name">${tipo}</span>
+                        </div>
+                        <div class="menu-meal-content">
+                `;
+                
+                if (meals.length > 0) {
+                    meals.forEach(meal => {
+                        const isConsumed = meal.estado === 'consumido';
+                        
+                        // Parsear alimentos
+                        const alimentosArray = meal.alimentos.split(',').map(a => a.trim());
+                        
+                        html += `<ul class="menu-food-list ${isConsumed ? 'menu-consumed' : ''}">`;
+                        
+                        alimentosArray.forEach(alimento => {
+                            const parts = alimento.split('|').map(p => p.trim());
+                            const nombre = parts[0];
+                            const porcion = parts[1] ? ` (${parts[1]})` : '';
+                            
+                            html += `<li>${nombre}${porcion}</li>`;
+                        });
+                        
+                        html += `</ul>`;
+                        
+                        if (isConsumed) {
+                            html += `<div class="menu-check">✓ Consumido</div>`;
+                        }
+                    });
+                } else {
+                    html += `<p class="menu-no-meal">Sin planificar</p>`;
+                }
+                
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `</div></div>`;
+            return html;
+        }
+        
+        function getMealIcon(tipo) {
+            const icons = {
+                'Desayuno': '🥐',
+                'Media Mañana': '🍎',
+                'Almuerzo': '🍽️',
+                'Merienda': '☕',
+                'Cena': '🌙',
+                'Colación': '🥤'
+            };
+            return icons[tipo] || '🍴';
+        }
+
+        function getShoppingMetrics(shoppingData) {
+            if (!shoppingData || shoppingData.length <= 1) {
+                return { progress: 0, total: 0, bought: 0 };
+            }
+
+            const rows = shoppingData.slice(1);
+            const total = rows.length;
+            let bought = 0;
+
+            rows.forEach(row => {
+                const status = (row[2] || '').toString().toLowerCase();
+                if (status === 'comprado' || status === 'completado') {
+                    bought++;
+                }
+            });
+
+            const progress = total === 0 ? 0 : Math.round((bought / total) * 100);
+            return { progress, total, bought };
+        }
+
+        // Toggle del calendario semanal
+        function toggleWeeklyCalendar(evt) {
+            if (evt) {
+                evt.preventDefault();
+            }
+
+            const body = document.getElementById('weekly-calendar-body');
+            const content = document.getElementById('weekly-calendar-content');
+            const icon = document.getElementById('calendar-collapse-icon');
+            const isHidden = body.style.display === 'none' || body.style.display === '';
+
+            if (isHidden) {
+                body.style.display = 'block';
+                if (content) {
+                    content.style.display = 'block';
+                }
+                icon.textContent = '▲';
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                body.style.display = 'none';
+                if (content) {
+                    content.style.display = 'none';
+                }
+                icon.textContent = '▼';
+                icon.style.transform = 'rotate(0deg)';
+            }
         }
 
         async function refreshMealsData() {
@@ -249,21 +623,673 @@
         }
 
         function filterShoppingList() {
+            applyCurrentFilter();
+        }
+
+        function applyCurrentFilter() {
             const filter = document.getElementById('filter-status').value;
-            // Implementation for filtering shopping list
-            console.log('Filtering shopping list by:', filter);
+            
+            if (!fullShoppingData || fullShoppingData.length === 0) {
+                return;
+            }
+            
+            let filteredData = [...fullShoppingData];
+            
+            // Aplicar filtro según selección
+            if (filter === 'pending') {
+                // Solo pendientes
+                filteredData = [
+                    filteredData[0], // Header
+                    ...filteredData.slice(1).filter(row => {
+                        const estado = row[2]?.toString().toLowerCase();
+                        return estado === 'pendiente' || estado === '';
+                    })
+                ];
+            } else if (filter === 'bought') {
+                // Solo comprados/completados
+                filteredData = [
+                    filteredData[0], // Header
+                    ...filteredData.slice(1).filter(row => {
+                        const estado = row[2]?.toString().toLowerCase();
+                        return estado === 'completado' || estado === 'comprado';
+                    })
+                ];
+            }
+            // Si es 'all', no filtramos nada, mostramos todo
+            
+            // Renderizar con los datos filtrados
+            renderChecklist(filteredData, 'lista-supermercado', {
+                headers: ['Producto', 'Cantidad', 'Estado'],
+                checkboxColumn: 2,
+                showHeaders: true,
+                asTable: true
+            });
+        }
+
+        function getShoppingStatsFromData(data) {
+            if (!data || data.length <= 1) {
+                return { total: 0, pending: 0, bought: 0 };
+            }
+
+            const rows = data.slice(1);
+            let bought = 0;
+
+            rows.forEach(row => {
+                const status = (row[2] || '').toString().toLowerCase();
+                if (status === 'comprado' || status === 'completado') {
+                    bought++;
+                }
+            });
+
+            const total = rows.length;
+            const pending = Math.max(total - bought, 0);
+
+            return { total, pending, bought };
+        }
+
+        function updateShoppingOverview(stats) {
+            const totalEl = document.getElementById('shopping-total');
+            const pendingEl = document.getElementById('shopping-pending');
+            const boughtEl = document.getElementById('shopping-bought');
+
+            if (!totalEl || !pendingEl || !boughtEl) {
+                return;
+            }
+
+            totalEl.textContent = stats.total;
+            pendingEl.textContent = stats.pending;
+            boughtEl.textContent = stats.bought;
+        }
+
+        function updateHeroShoppingStatus(stats) {
+            const heroStatusEl = document.getElementById('hero-shopping-status');
+            const heroDetailEl = document.getElementById('hero-shopping-detail');
+            const percent = stats.total === 0 ? 0 : Math.round((stats.bought / stats.total) * 100);
+
+            if (heroStatusEl) {
+                heroStatusEl.textContent = stats.total === 0 ? '--' : `${percent}%`;
+            }
+
+            if (heroDetailEl) {
+                heroDetailEl.textContent = stats.total === 0 ? '--' : `${stats.bought}/${stats.total}`;
+            }
         }
 
         function addNewItem() {
-            const product = prompt('Nombre del producto:');
-            const quantity = prompt('Cantidad:');
-            if (product && quantity) {
-                // Add to Google Sheets
-                console.log('Adding new item:', { product, quantity });
-                // Refresh the list
-                refreshMealsData();
+            // Mostrar el modal
+            const modal = document.getElementById('addProductModal');
+            modal.style.display = 'flex';
+            
+            // Agregar event listener
+            const form = document.getElementById('addProductForm');
+            form.removeEventListener('submit', submitNewProduct);
+            form.addEventListener('submit', submitNewProduct);
+            
+            // Limpiar el formulario
+            form.reset();
+        }
+
+        function closeAddModal() {
+            // Cerrar el modal
+            document.getElementById('addProductModal').style.display = 'none';
+            document.getElementById('addProductForm').reset();
+        }
+
+        async function submitNewProduct(event) {
+            event.preventDefault();
+            
+            const product = document.getElementById('productName').value.trim();
+            const quantity = document.getElementById('productQuantity').value.trim();
+            const category = document.getElementById('productCategory').value;
+            
+            if (!product || !quantity || !category) {
+                alert('Por favor completa todos los campos');
+                return;
+            }
+            
+            // Mostrar loading
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Agregando...';
+            submitBtn.disabled = true;
+            
+            try {
+                if (typeof window.appendSheetData !== 'function') {
+                    throw new Error('appendSheetData no está disponible');
+                }
+                
+                const newRow = [[product, quantity, 'pendiente', category, '']];
+                const success = await window.appendSheetData(
+                    GOOGLE_SHEETS_CONFIG.SHEET_ID,
+                    'Supermercado!A:E',
+                    newRow
+                );
+                
+                if (success) {
+                    closeAddModal();
+                    showSuccessMessage('Producto agregado correctamente');
+                    setTimeout(() => {
+                        loadMealPlanData();
+                    }, 500);
+                } else {
+                    alert('Error al agregar el producto. Intenta nuevamente.');
+                }
+            } catch (error) {
+                console.error('Error adding product:', error);
+                alert('Error al agregar el producto: ' + error.message);
+            } finally {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
             }
         }
+
+        function showSuccessMessage(message) {
+            const msg = document.createElement('div');
+            msg.className = 'success-toast';
+            msg.textContent = message;
+            document.body.appendChild(msg);
+            
+            setTimeout(() => {
+                msg.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                msg.classList.remove('show');
+                setTimeout(() => msg.remove(), 300);
+            }, 3000);
+        }
+
+        // Cerrar modal al hacer click fuera
+        window.onclick = function(event) {
+            const modal = document.getElementById('addProductModal');
+            if (event.target === modal) {
+                closeAddModal();
+            }
+        }
+
+        // ========== DAILY MEAL PLAN ==========
+        async function loadDailyPlan() {
+            try {
+                // Obtener datos de la hoja "PlanDiario"
+                const dailyData = await getSheetData(GOOGLE_SHEETS_CONFIG.SHEET_ID, 'PlanDiario');
+                
+                // Obtener día actual
+                const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+                const hoy = diasSemana[new Date().getDay()];
+
+                const heroDayEl = document.getElementById('hero-day');
+                if (heroDayEl) {
+                    heroDayEl.textContent = hoy;
+                }
+                
+                // Filtrar comidas del día actual
+                const comidasHoy = [];
+                dailyData.forEach((row, index) => {
+                    if (index === 0) return; // Skip header
+                    
+                    const dia = row[0];
+                    if (dia === hoy) {
+                        comidasHoy.push({
+                            dia: row[0],
+                            hora: row[1],
+                            comida: row[2],
+                            alimentos: row[3],
+                            estado: row[4] || 'pendiente',
+                            fecha: row[5] || '',
+                            _originalIndex: index
+                        });
+                    }
+                });
+                
+                // Ordenar por hora
+                comidasHoy.sort((a, b) => {
+                    return a.hora.localeCompare(b.hora);
+                });
+                
+                renderDailyPlan(comidasHoy);
+            } catch (error) {
+                console.error('Error loading daily plan:', error);
+                updateDailyOverview([]);
+                document.getElementById('plan-del-dia').innerHTML = `
+                    <div class="daily-plan-empty">
+                        <div class="daily-plan-empty-icon">🍽️</div>
+                        <p class="daily-plan-empty-text">No hay comidas programadas para hoy</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderDailyPlan(meals) {
+            updateDailyOverview(meals);
+
+            const container = document.getElementById('plan-del-dia');
+            const heroNextMealEl = document.getElementById('hero-next-meal');
+
+            if (heroNextMealEl) {
+                heroNextMealEl.textContent = 'Sin comidas programadas';
+            }
+            
+            if (!meals || meals.length === 0) {
+                container.innerHTML = `
+                    <div class="daily-plan-empty">
+                        <div class="daily-plan-empty-icon">🍽️</div>
+                        <p class="daily-plan-empty-text">No hay comidas programadas para hoy</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const mealIcons = {
+                'Desayuno': '🥐',
+                'Media Mañana': '🍎',
+                'Almuerzo': '🍽️',
+                'Merienda': '☕',
+                'Cena': '🌙',
+                'Colación': '🥤'
+            };
+            
+            // Encontrar la comida más próxima a la hora actual
+            const now = new Date();
+            const currentHour = now.getHours();
+            const currentMinute = now.getMinutes();
+            const currentTimeInMinutes = currentHour * 60 + currentMinute;
+            
+            let closestMealIndex = 0;
+            let minDifference = Infinity;
+            
+            meals.forEach((meal, index) => {
+                if (meal.estado.toLowerCase() === 'consumido') return; // Ignorar consumidos
+                
+                const [mealHour, mealMinute] = meal.hora.split(':').map(Number);
+                const mealTimeInMinutes = mealHour * 60 + mealMinute;
+                
+                // Calcular diferencia (preferir comidas futuras)
+                let difference = mealTimeInMinutes - currentTimeInMinutes;
+                if (difference < 0) difference = Math.abs(difference) + 1440; // Dar prioridad a futuras
+                
+                if (difference < minDifference) {
+                    minDifference = difference;
+                    closestMealIndex = index;
+                }
+            });
+            
+            const hasUpcomingMeal = minDifference !== Infinity;
+
+            // Renderizar comida principal (la más próxima)
+            const mainMeal = meals[closestMealIndex];
+            const mainIcon = mealIcons[mainMeal.comida] || '🍴';
+            const mainAlimentosArray = mainMeal.alimentos ? mainMeal.alimentos.split(',').map(a => a.trim()) : [];
+
+            if (heroNextMealEl && mainMeal) {
+                heroNextMealEl.textContent = hasUpcomingMeal ? `${mainMeal.comida} • ${mainMeal.hora}` : 'Plan del día completado';
+            }
+            
+            let html = `
+                <div class="daily-plan-hero">
+                    <div class="hero-meal-card">
+                        <div class="hero-meal-header">
+                            <div class="hero-meal-icon">${mainIcon}</div>
+                            <div class="hero-meal-info">
+                                <h3 class="hero-meal-name">${mainMeal.comida}</h3>
+                                <div class="hero-meal-time">⏰ ${mainMeal.hora}</div>
+                            </div>
+                            <span class="hero-meal-badge">${hasUpcomingMeal && mainMeal.estado.toLowerCase() !== 'consumido' ? 'Próxima' : 'Consumido'}</span>
+                        </div>
+                        
+                        <div class="hero-meal-foods">
+                            ${mainAlimentosArray.map(alimento => {
+                                const parts = alimento.split('|').map(p => p.trim());
+                                const nombre = parts[0];
+                                const porcion = parts[1] || '';
+                                
+                                return `
+                                    <div class="hero-food-item">
+                                        <span class="hero-food-name">${nombre}</span>
+                                        ${porcion ? `<span class="hero-food-portion">${porcion}</span>` : ''}
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                        
+                        <div class="hero-meal-actions">
+                            <label class="meal-checkbox-label">
+                                <input 
+                                    type="checkbox" 
+                                    ${mainMeal.estado.toLowerCase() === 'consumido' ? 'checked' : ''}
+                                    onchange="toggleMealStatus(${mainMeal._originalIndex}, this.checked)"
+                                />
+                                <span>Marcar como consumido</span>
+                            </label>
+                            <button class="btn-icon" onclick="editMeal(${mainMeal._originalIndex}, '${mainMeal.dia}', '${mainMeal.hora}', '${mainMeal.comida}', \`${mainMeal.alimentos.replace(/`/g, '\\`')}\`, '${mainMeal.estado}')" title="Editar">
+                                ✏️
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Renderizar comidas secundarias (resto de comidas)
+            const otherMeals = meals.filter((_, index) => index !== closestMealIndex);
+            
+            if (otherMeals.length > 0) {
+                html += '<div class="daily-plan-other-meals">';
+                
+                otherMeals.forEach(meal => {
+                    const isConsumed = meal.estado.toLowerCase() === 'consumido';
+                    const icon = mealIcons[meal.comida] || '🍴';
+                    const alimentosArray = meal.alimentos ? meal.alimentos.split(',').map(a => a.trim()) : [];
+                    
+                    html += `
+                        <div class="small-meal-card ${isConsumed ? 'consumed' : ''}" data-index="${meal._originalIndex}">
+                            <div class="small-meal-header">
+                                <div class="small-meal-icon">${icon}</div>
+                                <div class="small-meal-info">
+                                    <h4 class="small-meal-name">${meal.comida}</h4>
+                                    <div class="small-meal-time">${meal.hora}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="small-meal-foods">
+                                ${alimentosArray.slice(0, 2).map(alimento => {
+                                    const parts = alimento.split('|').map(p => p.trim());
+                                    const nombre = parts[0];
+                                    const porcion = parts[1] || '';
+                                    
+                                    return `
+                                        <div class="small-food-item">
+                                            <span class="small-food-name">${nombre}</span>
+                                            ${porcion ? `<span class="small-food-portion">${porcion}</span>` : ''}
+                                        </div>
+                                    `;
+                                }).join('')}
+                                ${alimentosArray.length > 2 ? `<div class="small-food-more">+${alimentosArray.length - 2} más</div>` : ''}
+                            </div>
+                            
+                            <div class="small-meal-actions">
+                                <label class="meal-checkbox-label">
+                                    <input 
+                                        type="checkbox" 
+                                        ${isConsumed ? 'checked' : ''}
+                                        onchange="toggleMealStatus(${meal._originalIndex}, this.checked)"
+                                    />
+                                </label>
+                                <button class="btn-icon" onclick="editMeal(${meal._originalIndex}, '${meal.dia}', '${meal.hora}', '${meal.comida}', \`${meal.alimentos.replace(/`/g, '\\`')}\`, '${meal.estado}')" title="Editar">
+                                    ✏️
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+            }
+            
+            container.innerHTML = html;
+        }
+
+        function updateDailyOverview(meals) {
+            const totalEl = document.getElementById('daily-total-meals');
+            const consumedEl = document.getElementById('daily-consumed-meals');
+            const pendingEl = document.getElementById('daily-pending-meals');
+
+            if (!totalEl || !consumedEl || !pendingEl) {
+                return;
+            }
+
+            if (!meals || meals.length === 0) {
+                totalEl.textContent = '0';
+                consumedEl.textContent = '0';
+                pendingEl.textContent = '0';
+                return;
+            }
+
+            const total = meals.length;
+            let consumed = 0;
+
+            meals.forEach(meal => {
+                const status = (meal.estado || '').toString().toLowerCase();
+                if (status === 'consumido') {
+                    consumed++;
+                }
+            });
+
+            const pending = Math.max(total - consumed, 0);
+
+            totalEl.textContent = total;
+            consumedEl.textContent = consumed;
+            pendingEl.textContent = pending;
+        }
+
+        async function toggleMealStatus(rowIndex, isConsumed) {
+            try {
+                const newStatus = isConsumed ? 'consumido' : 'pendiente';
+                const fecha = isConsumed ? new Date().toISOString().split('T')[0] : '';
+                
+                // Actualizar estado en Google Sheets
+                await Promise.all([
+                    window.updateSheetCell(
+                        GOOGLE_SHEETS_CONFIG.SHEET_ID,
+                        `PlanDiario!E${rowIndex + 1}`,
+                        newStatus
+                    ),
+                    window.updateSheetCell(
+                        GOOGLE_SHEETS_CONFIG.SHEET_ID,
+                        `PlanDiario!F${rowIndex + 1}`,
+                        fecha
+                    )
+                ]);
+                
+                // Recargar el plan del día
+                await loadDailyPlan();
+            } catch (error) {
+                console.error('Error updating meal status:', error);
+                alert('Error al actualizar el estado de la comida');
+            }
+        }
+
+        async function refreshDailyPlan() {
+            await loadDailyPlan();
+        }
+
+        // ========== MEAL MODAL FUNCTIONS ==========
+        let foodFieldCounter = 0;
+        
+        function openAddMealModal() {
+            const modal = document.getElementById('addMealModal');
+            const form = document.getElementById('addMealForm');
+            
+            // Configurar para crear nueva comida
+            document.getElementById('mealModalTitle').textContent = '➕ Agregar Comida';
+            document.getElementById('mealSubmitBtn').textContent = 'Agregar';
+            document.getElementById('mealRowIndex').value = '';
+            
+            // Establecer día y hora actual por defecto
+            const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+            const hoy = diasSemana[new Date().getDay()];
+            const horaActual = new Date().toTimeString().slice(0, 5);
+            
+            form.reset();
+            document.getElementById('mealDay').value = hoy;
+            document.getElementById('mealTime').value = horaActual;
+            
+            // Limpiar lista de alimentos y agregar uno vacío
+            document.getElementById('foodsList').innerHTML = '';
+            foodFieldCounter = 0;
+            addFoodField();
+            
+            modal.style.display = 'flex';
+            
+            // Agregar event listener
+            form.removeEventListener('submit', submitMeal);
+            form.addEventListener('submit', submitMeal);
+        }
+
+        function editMeal(rowIndex, dia, hora, comida, alimentos, estado) {
+            const modal = document.getElementById('addMealModal');
+            const form = document.getElementById('addMealForm');
+            
+            // Configurar para editar comida existente
+            document.getElementById('mealModalTitle').textContent = '✏️ Editar Comida';
+            document.getElementById('mealSubmitBtn').textContent = 'Guardar';
+            document.getElementById('mealRowIndex').value = rowIndex;
+            
+            // Rellenar formulario con datos existentes
+            document.getElementById('mealDay').value = dia;
+            document.getElementById('mealTime').value = hora;
+            document.getElementById('mealType').value = comida;
+            
+            // Limpiar y rellenar alimentos
+            document.getElementById('foodsList').innerHTML = '';
+            foodFieldCounter = 0;
+            
+            const alimentosArray = alimentos.split(',').map(a => a.trim());
+            alimentosArray.forEach(alimento => {
+                const parts = alimento.split('|').map(p => p.trim());
+                addFoodField(parts[0], parts[1] || '');
+            });
+            
+            modal.style.display = 'flex';
+            
+            // Agregar event listener
+            form.removeEventListener('submit', submitMeal);
+            form.addEventListener('submit', submitMeal);
+        }
+
+        function addFoodField(nombre = '', porcion = '') {
+            const container = document.getElementById('foodsList');
+            const fieldId = foodFieldCounter++;
+            
+            const foodRow = document.createElement('div');
+            foodRow.className = 'food-row';
+            foodRow.id = `food-row-${fieldId}`;
+            
+            foodRow.innerHTML = `
+                <input 
+                    type="text" 
+                    class="food-name-input" 
+                    placeholder="Alimento (ej: Avena)"
+                    value="${nombre}"
+                    required
+                />
+                <input 
+                    type="text" 
+                    class="food-portion-input" 
+                    placeholder="Porción (ej: 50g, 1 taza)"
+                    value="${porcion}"
+                />
+                <button type="button" class="btn-remove-food" onclick="removeFoodField(${fieldId})" title="Eliminar">
+                    🗑️
+                </button>
+            `;
+            
+            container.appendChild(foodRow);
+        }
+
+        function removeFoodField(fieldId) {
+            const row = document.getElementById(`food-row-${fieldId}`);
+            if (row) {
+                row.remove();
+            }
+            
+            // Si no quedan campos, agregar uno nuevo
+            const container = document.getElementById('foodsList');
+            if (container.children.length === 0) {
+                addFoodField();
+            }
+        }
+
+        function closeMealModal() {
+            document.getElementById('addMealModal').style.display = 'none';
+            document.getElementById('addMealForm').reset();
+            document.getElementById('foodsList').innerHTML = '';
+        }
+
+        async function submitMeal(event) {
+            event.preventDefault();
+            
+            const dia = document.getElementById('mealDay').value;
+            const hora = document.getElementById('mealTime').value;
+            const comida = document.getElementById('mealType').value;
+            const rowIndex = document.getElementById('mealRowIndex').value;
+            
+            // Recopilar alimentos de los campos dinámicos
+            const foodRows = document.querySelectorAll('.food-row');
+            const alimentosArray = [];
+            
+            foodRows.forEach(row => {
+                const nombre = row.querySelector('.food-name-input').value.trim();
+                const porcion = row.querySelector('.food-portion-input').value.trim();
+                
+                if (nombre) {
+                    if (porcion) {
+                        alimentosArray.push(`${nombre} | ${porcion}`);
+                    } else {
+                        alimentosArray.push(nombre);
+                    }
+                }
+            });
+            
+            const alimentos = alimentosArray.join(', ');
+            
+            if (!dia || !hora || !comida || alimentosArray.length === 0) {
+                alert('Por favor completa todos los campos obligatorios');
+                return;
+            }
+            
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = rowIndex ? 'Guardando...' : 'Agregando...';
+            submitBtn.disabled = true;
+            
+            try {
+                if (rowIndex) {
+                    // Editar comida existente
+                    await Promise.all([
+                        window.updateSheetCell(GOOGLE_SHEETS_CONFIG.SHEET_ID, `PlanDiario!A${parseInt(rowIndex) + 1}`, dia),
+                        window.updateSheetCell(GOOGLE_SHEETS_CONFIG.SHEET_ID, `PlanDiario!B${parseInt(rowIndex) + 1}`, hora),
+                        window.updateSheetCell(GOOGLE_SHEETS_CONFIG.SHEET_ID, `PlanDiario!C${parseInt(rowIndex) + 1}`, comida),
+                        window.updateSheetCell(GOOGLE_SHEETS_CONFIG.SHEET_ID, `PlanDiario!D${parseInt(rowIndex) + 1}`, alimentos)
+                    ]);
+                    
+                    showSuccessMessage('Comida actualizada correctamente');
+                } else {
+                    // Agregar nueva comida
+                    const newRow = [[dia, hora, comida, alimentos, 'pendiente', '']];
+                    const success = await window.appendSheetData(
+                        GOOGLE_SHEETS_CONFIG.SHEET_ID,
+                        'PlanDiario!A:F',
+                        newRow
+                    );
+                    
+                    if (!success) {
+                        throw new Error('Error al agregar la comida');
+                    }
+                    
+                    showSuccessMessage('Comida agregada correctamente');
+                }
+                
+                closeMealModal();
+                
+                setTimeout(() => {
+                    loadDailyPlan();
+                }, 500);
+                
+            } catch (error) {
+                console.error('Error saving meal:', error);
+                alert('Error al guardar la comida: ' + error.message);
+            } finally {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+        }
+
+        // Cerrar modal de comida al hacer click fuera
+        window.addEventListener('click', function(event) {
+            const mealModal = document.getElementById('addMealModal');
+            if (event.target === mealModal) {
+                closeMealModal();
+            }
+        });
 
         function planNextWeek() {
             alert('Función de planificación semanal en desarrollo');

@@ -339,8 +339,20 @@ function renderChecklistAsTable(data, container, headers, checkboxColumn) {
             // Deshabilitar el checkbox mientras se actualiza
             checkbox.disabled = true;
             
+            // Agregar clase de carga a la fila
+            row.classList.add('updating');
+            
+            // Crear y mostrar spinner
+            const spinner = document.createElement('div');
+            spinner.className = 'table-spinner';
+            spinner.innerHTML = '<div class="spinner-small"></div>';
+            checkboxTd.appendChild(spinner);
+            
             // Actualizar en Google Sheets
             await toggleChecklistItem(index, itemData, checkboxColumn);
+            
+            // Remover spinner
+            spinner.remove();
             
             // Esperar un poco para que se complete la actualización
             setTimeout(() => {
@@ -349,43 +361,39 @@ function renderChecklistAsTable(data, container, headers, checkboxColumn) {
                     const newData = [data[0], ...items];
                     renderChecklistAsTable(newData, container, headers, checkboxColumn);
                 }
-            }, 500);
+            }, 300);
         });
         
         checkboxTd.appendChild(checkbox);
         row.appendChild(checkboxTd);
         
-        // Add data cells (skip Estado column)
-        itemData.forEach((cellData, cellIndex) => {
-            if (cellIndex !== checkboxColumn) {
-                const td = document.createElement('td');
-                
-                if (isCompleted) {
-                    td.style.textDecoration = 'line-through';
-                }
-                
-                // Formateo especial para ciertas columnas
-                if (cellIndex === 0) {
-                    // Producto - negrita
-                    td.className = 'product-name-cell';
-                    td.textContent = cellData || '';
-                } else if (cellIndex === 3) {
-                    // Categoría - con badge
-                    td.className = 'category-cell';
-                    const badge = document.createElement('span');
-                    badge.className = 'category-badge';
-                    badge.textContent = cellData || '';
-                    td.appendChild(badge);
-                } else if (cellIndex === 4 && cellData) {
-                    // Fecha - con ícono
-                    td.className = 'date-cell';
-                    td.innerHTML = `<span class="date-badge">📅 ${cellData}</span>`;
-                } else {
-                    td.textContent = cellData || '';
-                }
-                
-                row.appendChild(td);
+        // Add data cells - Solo Producto (col 0) y Cantidad (col 1)
+        // Omitimos Estado (col 2), Categoría (col 3) y Fecha (col 4)
+        const columnsToShow = [0, 1]; // Solo Producto y Cantidad
+        
+        columnsToShow.forEach((cellIndex) => {
+            const cellData = itemData[cellIndex];
+            const td = document.createElement('td');
+            
+            // Add data-label for mobile view
+            if (headers[cellIndex]) {
+                td.setAttribute('data-label', headers[cellIndex] + ':');
             }
+            
+            if (isCompleted) {
+                td.style.textDecoration = 'line-through';
+            }
+            
+            // Formateo especial para ciertas columnas
+            if (cellIndex === 0) {
+                // Producto - negrita
+                td.className = 'product-name-cell';
+                td.textContent = cellData || '';
+            } else {
+                td.textContent = cellData || '';
+            }
+            
+            row.appendChild(td);
         });
         
         tbody.appendChild(row);
@@ -559,13 +567,11 @@ async function toggleChecklistItem(index, itemData, statusColumn) {
     const cellRange = `${sheetName}!${cellColumn}${realIndex + 1}`; // +1 porque Google Sheets usa índices 1-based
     
     if (window.updateSheetCell) {
-        // Actualizar el estado
-        const success = await window.updateSheetCell(GOOGLE_SHEETS_CONFIG.SHEET_ID, cellRange, newStatus);
+        // Preparar las promesas de actualización
+        const updates = [];
         
-        if (!success) {
-            console.error('Error actualizando estado');
-            return false;
-        }
+        // Actualizar el estado
+        updates.push(window.updateSheetCell(GOOGLE_SHEETS_CONFIG.SHEET_ID, cellRange, newStatus));
         
         // Si se completó, actualizar también la columna Fecha_ok (columna E = índice 4)
         if (newStatus === 'completado' || newStatus === 'comprado') {
@@ -573,18 +579,22 @@ async function toggleChecklistItem(index, itemData, statusColumn) {
             const fechaColumn = 'E'; // Columna de Fecha_ok
             const fechaRange = `${sheetName}!${fechaColumn}${realIndex + 1}`;
             
-            await window.updateSheetCell(GOOGLE_SHEETS_CONFIG.SHEET_ID, fechaRange, fechaActual);
+            updates.push(window.updateSheetCell(GOOGLE_SHEETS_CONFIG.SHEET_ID, fechaRange, fechaActual));
             itemData[4] = fechaActual; // Actualizar en el array local también
         } else {
             // Si se marca como pendiente, limpiar la fecha
             const fechaColumn = 'E';
             const fechaRange = `${sheetName}!${fechaColumn}${realIndex + 1}`;
             
-            await window.updateSheetCell(GOOGLE_SHEETS_CONFIG.SHEET_ID, fechaRange, '');
+            updates.push(window.updateSheetCell(GOOGLE_SHEETS_CONFIG.SHEET_ID, fechaRange, ''));
             itemData[4] = ''; // Limpiar en el array local también
         }
         
-        return true;
+        // Ejecutar todas las actualizaciones en paralelo
+        const results = await Promise.all(updates);
+        
+        // Verificar si todas fueron exitosas
+        return results.every(result => result === true);
     } else {
         console.warn('updateSheetCell no está disponible');
         return false;

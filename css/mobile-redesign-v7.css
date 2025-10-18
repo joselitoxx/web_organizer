@@ -1,10 +1,7 @@
-/*
- Archivo consolidado y optimizado: style.css
- Generado a partir de mobile-redesign-v7.css (v9) el 2025-10-18
- MOBILE REDESIGN V7 - REFACTORIZACIÓN COMPLETA
- Sistema de diseño moderno y consistente
- ========================================
-*/
+/* ========================================
+   MOBILE REDESIGN V7 - REFACTORIZACIÓN COMPLETA
+   Sistema de diseño moderno y consistente
+======================================== */
 
 /* ===== VARIABLES DE DISEÑO ===== */
 :root {
@@ -293,7 +290,7 @@ section.hero-section .hero-banner {
 }
 
 /* ===== MODALS - ESTILOS GLOBALES ===== */
-/* Base de overlay (fuera de media queries) */
+/* Base de overlay */
 .modal {
     display: none !important;
     position: fixed !important;
@@ -305,7 +302,7 @@ section.hero-section .hero-banner {
     -webkit-backdrop-filter: blur(10px) !important;
 }
 
-/* Mostrar cuando JS aplica display:flex o con clase .show */
+/* Mostrar cuando el JS aplica display:flex o se agrega la clase .show */
 .modal.show,
 .modal[style*="display:flex"],
 .modal[style*="display: flex"] {
@@ -334,7 +331,7 @@ section.hero-section .hero-banner {
     to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
-/* Header y botón de cierre unificado */
+/* Header y título */
 .modal-header {
     padding: 1.5rem !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
@@ -350,6 +347,7 @@ section.hero-section .hero-banner {
     letter-spacing: -0.01em !important;
 }
 
+/* Unificar .close y .close-modal */
 .modal-header .close,
 .modal-header .close-modal,
 .close-modal {
@@ -369,8 +367,11 @@ section.hero-section .hero-banner {
 
 .modal-header .close:hover,
 .modal-header .close-modal:hover,
-.close-modal:hover { color: white !important; }
+.close-modal:hover {
+    color: white !important;
+}
 
+/* Cuerpo y footer */
 .modal-body {
     padding: 1.5rem !important;
     overflow-y: auto !important;
@@ -1426,13 +1427,7 @@ section.hero-section .hero-banner {
     }
     
     /* ===== MODALS - Bottom Sheet Mejorado ===== */
-    .modal {
-        align-items: flex-end !important;
-        padding: 0 !important;
-        background: rgba(0, 0, 0, 0.7) !important;
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-    }
+    .modal { align-items: flex-end !important; padding: 0 !important; }
     
     .modal-content {
         width: 100% !important;
@@ -1442,7 +1437,6 @@ section.hero-section .hero-banner {
         max-height: 85vh !important;
         animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.4);
-        background: linear-gradient(135deg, #1a1a1a 0%, #252525 100%);
     }
     
     @keyframes slideUp {
@@ -1484,13 +1478,7 @@ section.hero-section .hero-banner {
         letter-spacing: -0.01em;
     }
     
-    .modal-body {
-        padding: var(--space-5) !important;
-        overflow-y: auto;
-        max-height: calc(85vh - 200px);
-        background: linear-gradient(135deg, #1a1a1a 0%, #252525 100%);
-        color: white;
-    }
+    .modal-body { padding: var(--space-5) !important; overflow-y: auto; max-height: calc(85vh - 200px); }
     
     .modal-footer {
         padding: var(--space-5) !important;
