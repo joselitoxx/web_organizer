@@ -141,10 +141,17 @@ function renderChecklist(data, containerId, options = {}) {
     const {
         headers = data[0],
         checkboxColumn = -1,
-        showHeaders = true
+        showHeaders = true,
+        asTable = false
     } = options;
 
-    // Create checklist container
+    // Si se solicita modo tabla
+    if (asTable) {
+        renderChecklistAsTable(data, container, headers, checkboxColumn);
+        return;
+    }
+
+    // Create checklist container (modo original)
     const checklist = document.createElement('div');
     checklist.className = 'checklist';
 
@@ -174,27 +181,69 @@ function renderChecklist(data, containerId, options = {}) {
 
         // Add checkbox if specified
         if (checkboxColumn >= 0) {
+            const checkboxWrapper = document.createElement('div');
+            checkboxWrapper.className = 'checkbox-wrapper';
+            
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
+            checkbox.id = `checkbox-${index}`;
             checkbox.checked = isCompleted;
             checkbox.addEventListener('change', () => {
                 toggleChecklistItem(index, itemData, checkboxColumn);
                 item.classList.toggle('completed');
             });
-            item.appendChild(checkbox);
+            
+            const label = document.createElement('label');
+            label.htmlFor = `checkbox-${index}`;
+            
+            checkboxWrapper.appendChild(checkbox);
+            checkboxWrapper.appendChild(label);
+            item.appendChild(checkboxWrapper);
         }
 
         // Add item content
         const content = document.createElement('div');
         content.className = 'checklist-content';
         
-        itemData.forEach((cellData, cellIndex) => {
-            if (cellIndex !== checkboxColumn) {
-                const span = document.createElement('span');
-                span.textContent = cellData || ' ';
-                content.appendChild(span);
-            }
-        });
+        // Producto (columna 0) - destacado
+        if (itemData[0]) {
+            const productName = document.createElement('div');
+            productName.className = 'product-name';
+            productName.textContent = itemData[0];
+            content.appendChild(productName);
+        }
+        
+        // Cantidad (columna 1)
+        if (itemData[1]) {
+            const quantity = document.createElement('div');
+            quantity.className = 'product-quantity';
+            quantity.innerHTML = `<span class="label">Cantidad:</span> ${itemData[1]}`;
+            content.appendChild(quantity);
+        }
+        
+        // Estado (columna 2) - ya está en el checkbox, pero podemos mostrar como badge
+        if (itemData[2]) {
+            const status = document.createElement('div');
+            status.className = `product-status status-${itemData[2].toLowerCase()}`;
+            status.textContent = itemData[2];
+            content.appendChild(status);
+        }
+        
+        // Categoría (columna 3) - opcional
+        if (itemData[3]) {
+            const category = document.createElement('div');
+            category.className = 'product-category';
+            category.innerHTML = `<span class="icon">🏷️</span> ${itemData[3]}`;
+            content.appendChild(category);
+        }
+        
+        // Fecha_ok (columna 4) - si existe
+        if (itemData[4]) {
+            const date = document.createElement('div');
+            date.className = 'product-date';
+            date.innerHTML = `<span class="icon">📅</span> ${itemData[4]}`;
+            content.appendChild(date);
+        }
 
         item.appendChild(content);
         checklist.appendChild(item);
@@ -204,6 +253,149 @@ function renderChecklist(data, containerId, options = {}) {
 
     // Add slide-in animation
     checklist.classList.add('slide-in');
+}
+
+/**
+ * Render checklist as a table
+ * @param {Array} data - 2D array with headers in first row
+ * @param {HTMLElement} container - Container element
+ * @param {Array} headers - Headers array
+ * @param {number} checkboxColumn - Column containing checkbox/status
+ */
+function renderChecklistAsTable(data, container, headers, checkboxColumn) {
+    // Limpiar el contenedor antes de renderizar
+    container.innerHTML = '';
+    
+    // Create table
+    const table = document.createElement('table');
+    table.className = 'checklist-table';
+
+    // Create header
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    
+    // Add checkbox column header
+    const checkboxTh = document.createElement('th');
+    checkboxTh.className = 'checkbox-column';
+    checkboxTh.textContent = '✓';
+    headerRow.appendChild(checkboxTh);
+    
+    // Add other headers (skip Estado column)
+    headers.forEach((header, index) => {
+        if (index !== checkboxColumn) {
+            const th = document.createElement('th');
+            th.textContent = header;
+            headerRow.appendChild(th);
+        }
+    });
+    
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    // Create body
+    const tbody = document.createElement('tbody');
+    const items = data.slice(1); // Skip header row
+    
+    // Separar items en completados y pendientes
+    const pendingItems = [];
+    const completedItems = [];
+    
+    items.forEach((itemData, index) => {
+        const isCompleted = checkboxColumn >= 0 && 
+            (itemData[checkboxColumn]?.toString().toLowerCase() === 'completado' ||
+             itemData[checkboxColumn]?.toString().toLowerCase() === 'comprado');
+        
+        if (isCompleted) {
+            completedItems.push({ itemData, index });
+        } else {
+            pendingItems.push({ itemData, index });
+        }
+    });
+    
+    // Renderizar primero los pendientes, luego los completados
+    const sortedItems = [...pendingItems, ...completedItems];
+    
+    sortedItems.forEach(({ itemData, index }) => {
+        const row = document.createElement('tr');
+        
+        // Determine if item is completed
+        const isCompleted = checkboxColumn >= 0 && 
+            (itemData[checkboxColumn]?.toString().toLowerCase() === 'completado' ||
+             itemData[checkboxColumn]?.toString().toLowerCase() === 'comprado');
+        
+        if (isCompleted) {
+            row.classList.add('completed');
+            row.style.textDecoration = 'line-through';
+        }
+        
+        // Add checkbox cell
+        const checkboxTd = document.createElement('td');
+        checkboxTd.className = 'checkbox-cell';
+        
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = isCompleted;
+        checkbox.addEventListener('change', async () => {
+            // Deshabilitar el checkbox mientras se actualiza
+            checkbox.disabled = true;
+            
+            // Actualizar en Google Sheets
+            await toggleChecklistItem(index, itemData, checkboxColumn);
+            
+            // Esperar un poco para que se complete la actualización
+            setTimeout(() => {
+                // Recargar solo si el contenedor aún existe
+                if (container && container.parentElement) {
+                    const newData = [data[0], ...items];
+                    renderChecklistAsTable(newData, container, headers, checkboxColumn);
+                }
+            }, 500);
+        });
+        
+        checkboxTd.appendChild(checkbox);
+        row.appendChild(checkboxTd);
+        
+        // Add data cells (skip Estado column)
+        itemData.forEach((cellData, cellIndex) => {
+            if (cellIndex !== checkboxColumn) {
+                const td = document.createElement('td');
+                
+                if (isCompleted) {
+                    td.style.textDecoration = 'line-through';
+                }
+                
+                // Formateo especial para ciertas columnas
+                if (cellIndex === 0) {
+                    // Producto - negrita
+                    td.className = 'product-name-cell';
+                    td.textContent = cellData || '';
+                } else if (cellIndex === 3) {
+                    // Categoría - con badge
+                    td.className = 'category-cell';
+                    const badge = document.createElement('span');
+                    badge.className = 'category-badge';
+                    badge.textContent = cellData || '';
+                    td.appendChild(badge);
+                } else if (cellIndex === 4 && cellData) {
+                    // Fecha - con ícono
+                    td.className = 'date-cell';
+                    td.innerHTML = `<span class="date-badge">📅 ${cellData}</span>`;
+                } else {
+                    td.textContent = cellData || '';
+                }
+                
+                row.appendChild(td);
+            }
+        });
+        
+        tbody.appendChild(row);
+    });
+    
+    table.appendChild(tbody);
+    container.appendChild(table);
+    
+    // Add slide-in animation
+    table.classList.add('slide-in');
 }
 
 /**
@@ -343,7 +535,7 @@ function getActionButtonText(status) {
  * @param {Array} itemData - Item data array
  * @param {number} statusColumn - Column containing status
  */
-function toggleChecklistItem(index, itemData, statusColumn) {
+async function toggleChecklistItem(index, itemData, statusColumn) {
     const currentStatus = itemData[statusColumn]?.toString().toLowerCase();
     let newStatus;
     if (currentStatus === 'completado' || currentStatus === 'comprado') {
@@ -368,45 +560,34 @@ function toggleChecklistItem(index, itemData, statusColumn) {
     
     if (window.updateSheetCell) {
         // Actualizar el estado
-        window.updateSheetCell(GOOGLE_SHEETS_CONFIG.SHEET_ID, cellRange, newStatus)
-            .then((success) => {
-                if (!success) {
-                    console.error('Error actualizando estado');
-                    return;
-                }
-                
-                // Si se completó, actualizar también la columna Fecha_ok (columna E = índice 4)
-                if (newStatus === 'completado' || newStatus === 'comprado') {
-                    const fechaActual = new Date().toISOString().split('T')[0]; // Formato YYYY-MM-DD
-                    const fechaColumn = 'E'; // Columna de Fecha_ok
-                    const fechaRange = `${sheetName}!${fechaColumn}${realIndex + 1}`;
-                    
-                    return window.updateSheetCell(GOOGLE_SHEETS_CONFIG.SHEET_ID, fechaRange, fechaActual)
-                        .then(() => {
-                            itemData[4] = fechaActual; // Actualizar en el array local también
-                        })
-                        .catch(err => {
-                            console.error('Error actualizando fecha:', err);
-                        });
-                } else {
-                    // Si se marca como pendiente, limpiar la fecha
-                    const fechaColumn = 'E';
-                    const fechaRange = `${sheetName}!${fechaColumn}${realIndex + 1}`;
-                    
-                    return window.updateSheetCell(GOOGLE_SHEETS_CONFIG.SHEET_ID, fechaRange, '')
-                        .then(() => {
-                            itemData[4] = ''; // Limpiar en el array local también
-                        })
-                        .catch(err => {
-                            console.error('Error limpiando fecha:', err);
-                        });
-                }
-            })
-            .catch(err => {
-                console.error('Error actualizando en Google Sheets:', err);
-            });
+        const success = await window.updateSheetCell(GOOGLE_SHEETS_CONFIG.SHEET_ID, cellRange, newStatus);
+        
+        if (!success) {
+            console.error('Error actualizando estado');
+            return false;
+        }
+        
+        // Si se completó, actualizar también la columna Fecha_ok (columna E = índice 4)
+        if (newStatus === 'completado' || newStatus === 'comprado') {
+            const fechaActual = new Date().toISOString().split('T')[0]; // Formato YYYY-MM-DD
+            const fechaColumn = 'E'; // Columna de Fecha_ok
+            const fechaRange = `${sheetName}!${fechaColumn}${realIndex + 1}`;
+            
+            await window.updateSheetCell(GOOGLE_SHEETS_CONFIG.SHEET_ID, fechaRange, fechaActual);
+            itemData[4] = fechaActual; // Actualizar en el array local también
+        } else {
+            // Si se marca como pendiente, limpiar la fecha
+            const fechaColumn = 'E';
+            const fechaRange = `${sheetName}!${fechaColumn}${realIndex + 1}`;
+            
+            await window.updateSheetCell(GOOGLE_SHEETS_CONFIG.SHEET_ID, fechaRange, '');
+            itemData[4] = ''; // Limpiar en el array local también
+        }
+        
+        return true;
     } else {
         console.warn('updateSheetCell no está disponible');
+        return false;
     }
 }
 

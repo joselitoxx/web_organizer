@@ -138,8 +138,8 @@
     </footer>
 
     <!-- Scripts -->
-    <script src="../js/sheets.js?v=4"></script>
-    <script src="../js/ui.js?v=4"></script>
+    <script src="../js/sheets.js?v=8"></script>
+    <script src="../js/ui.js?v=8"></script>
     <script>
         // Initialize page data
         document.addEventListener('DOMContentLoaded', async function() {
@@ -202,8 +202,10 @@
                 });
                 
                 renderChecklist(alimentosData, 'lista-supermercado', {
-                    headers: ['Producto', 'Cantidad', 'Estado', 'Categoría', 'Fecha_ok'],
-                    checkboxColumn: 2
+                    headers: ['Producto', 'Cantidad', 'Estado', 'Categoría', 'Fecha'],
+                    checkboxColumn: 2,
+                    showHeaders: true,
+                    asTable: true
                 });
 
                 // Update statistics
